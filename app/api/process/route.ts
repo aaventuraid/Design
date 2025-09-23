@@ -18,11 +18,12 @@ export async function POST(req: NextRequest) {
     const presetConfig = getPresetConfig(preset);
 
     const arrayBuffer = await file.arrayBuffer();
-    let img = sharp(Buffer.from(arrayBuffer)).removeAlpha().toColorspace('rgb');
+    // Ensure processing in standard sRGB colorspace; avoid invalid 'rgb' target
+    let img = sharp(Buffer.from(arrayBuffer)).removeAlpha().toColorspace('srgb');
 
     // Convert to PNG with transparent background by detecting white-ish background and making it transparent
     // Simple heuristic: Use chroma-key against near-white
-    const { data, info } = await img.raw().ensureAlpha().toBuffer({ resolveWithObject: true });
+    const { data, info } = await img.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
     const key = { r: 255, g: 255, b: 255 };
     const tol = Math.max(0, Math.min(255, tolerance));
     for (let i = 0; i < data.length; i += 4) {
@@ -56,12 +57,18 @@ export async function POST(req: NextRequest) {
     if (addBranding && presetConfig.branding?.logoOverlay) {
       // TODO: Implement logo overlay with brand colors
       // For now, we'll add a subtle brand-colored border
+      const dims =
+        preset === 'general'
+          ? await out
+              .metadata()
+              .then((m) => ({ width: m.width || info.width, height: m.height || info.height }))
+          : presetConfig.dimensions;
       out = out.composite([
         {
           input: Buffer.from(`
-          <svg width="${presetConfig.dimensions.width}" height="${presetConfig.dimensions.height}">
-            <rect x="0" y="0" width="${presetConfig.dimensions.width}" height="8" fill="${Brand.colors.primaryOrange}"/>
-            <rect x="0" y="${presetConfig.dimensions.height - 8}" width="${presetConfig.dimensions.width}" height="8" fill="${Brand.colors.primaryBlue}"/>
+          <svg width="${dims.width}" height="${dims.height}">
+            <rect x="0" y="0" width="${dims.width}" height="8" fill="${Brand.colors.primaryOrange}"/>
+            <rect x="0" y="${(dims.height as number) - 8}" width="${dims.width}" height="8" fill="${Brand.colors.primaryBlue}"/>
           </svg>
         `),
           top: 0,
