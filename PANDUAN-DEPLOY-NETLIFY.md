@@ -34,17 +34,31 @@ Pastikan kode Yuki Yaki Corner sudah di-upload ke GitHub:
    - Pilih **"Public"** atau **"Private"**
    - Klik **"Create repository"**
 
-2. **Upload kode ke GitHub:**
+2. **Setup GitHub CLI Authentication (Recommended untuk Private Repository):**
+   ```bash
+   # Install GitHub CLI dari https://cli.github.com/
+   # Atau via winget: winget install --id GitHub.cli
+   
+   # Login ke GitHub
+   gh auth login
+   # Pilih: GitHub.com → HTTPS → Yes → Login with web browser
+   
+   # Verify authentication
+   gh auth status
+   ```
+
+3. **Upload kode ke GitHub:**
    ```bash
    # Di folder project (D:\2AI)
    git init
    git add .
-   git commit -m "Initial commit"
-   git remote add origin https://github.com/USERNAME/yuki-yaki-corner.git
+   git commit -m "Initial commit: Yuki Yaki Corner v0.1.0"
+   git remote add origin https://github.com/aaventuraid/AAVENTURA.git
+   git branch -M main
    git push -u origin main
    ```
    
-   *Ganti `USERNAME` dengan username GitHub Anda*
+   *GitHub CLI akan otomatis handle authentication untuk private repository*
 
 ---
 
@@ -124,6 +138,24 @@ Setelah deploy berhasil:
 4. Test admin panel di `/admin`
 
 ### 4.2 Common Issues & Solutions
+
+#### ❌ "Repository not found" atau "Permission denied"
+**Penyebab:** Authentication gagal atau tidak ada akses ke private repository
+**Solusi:**
+```bash
+# Setup GitHub CLI authentication
+gh auth login
+# Pilih: GitHub.com → HTTPS → Yes → Login with browser
+
+# Verify authentication
+gh auth status
+
+# Test repository access
+gh repo view aaventuraid/AAVENTURA
+
+# Push ulang
+git push -u origin main
+```
 
 #### ❌ Build Failed
 **Solusi:**
