@@ -1,48 +1,49 @@
 # Dockerfile optimized for Coolify deployment
 FROM node:18-alpine AS base
 
-# Install dependencies only when needed
-FROM base AS deps
-RUN apk add --no-cache libc6-compat
-WORKDIR /app
-
-# Install dependencies based on the preferred package manager
-COPY package.json package-lock.json* ./
-RUN npm ci --only=production
-
-# Rebuild the source code only when needed
+# ----------------------
+# Deps + Build stage
+# ----------------------
 FROM base AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+RUN apk add --no-cache libc6-compat
 
-# Build the application
+# Disable husky during CI/build to avoid "husky: not found" and .git checks
+ENV HUSKY=0
+
+# Install all dependencies (including dev) for build time (Tailwind/PostCSS, etc.)
+COPY package.json package-lock.json* ./
+RUN npm ci --no-audit --no-fund
+
+# Copy source and build
+COPY . .
 RUN npm run build
 
-# Production image, copy all the files and run next
+# ----------------------
+# Production runtime
+# ----------------------
 FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Non-root user
+RUN addgroup --system --gid 1001 nodejs \
+	&& adduser --system --uid 1001 nextjs
 
-# Copy public files
+# Copy public and built output only
 COPY --from=builder /app/public ./public
 
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
+# Create .next dir for static assets and correct permissions
+RUN mkdir -p .next && chown nextjs:nodejs .next
 
-# Automatically leverage output traces to reduce image size
+# Copy Next.js standalone server build
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
 EXPOSE 3000
-
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
