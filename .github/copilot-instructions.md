@@ -2,6 +2,12 @@ Kerangka Prompt Universal untuk GitHub Copilot
 Panduan untuk Proyek Multi-Teknologi & Migrasi
 Dokumen ini menyediakan pola (pattern) untuk membuat prompt (komentar kode) yang efektif dan universal untuk GitHub Copilot. Pola ini bisa diadaptasi untuk berbagai framework (Next.js, Laravel, Svelte, dll.) dan skenario, termasuk pembuatan proyek baru dan migrasi.
 
+Catatan Kebijakan Proyek (AI):
+- Proyek ini hanya menggunakan Gemini sebagai penyedia AI. Jangan menulis integrasi untuk provider lain.
+- Gunakan environment variable GEMINI_API_KEY atau halaman Admin untuk menyimpan key (tersimpan ke .data/settings.json jika tidak dioverride env).
+- Endpoint AI: app/api/generate-copy/route.ts memanggil Gemini melalui lib/ai-service.ts.
+- Fitur Eksperimen “Banana”: aktifkan dengan field bananaMode: true pada payload generate copy atau toggle di UI CopyGenerator.
+
 Pola Dasar Prompt yang Efektif
 Setiap prompt yang baik harus mengandung empat elemen:
 

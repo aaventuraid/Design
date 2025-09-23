@@ -13,7 +13,9 @@ export async function POST(req: NextRequest) {
     }
 
     const settings = await getSettings();
-    const aiService = new AIService(settings.geminiApiKey, settings.githubModelsApiKey);
+    // If admin sets default provider to local, force local by not passing the Gemini key
+    const effectiveGeminiKey = settings.defaultAIProvider === 'local' ? undefined : settings.geminiApiKey;
+    const aiService = new AIService(effectiveGeminiKey, undefined);
 
     const copy = await aiService.generateCopy({
       productName: options.productName,

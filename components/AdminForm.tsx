@@ -155,7 +155,11 @@ export default function AdminForm() {
                   onChange={(e) => setSettings({ ...settings, geminiApiKey: e.target.value })}
                   placeholder="Masukkan Gemini API key"
                 />
-                <p className="text-xs text-neutral-gray mt-1">Digunakan untuk generator copy AI (hanya Gemini yang didukung)</p>
+                <p className="text-xs text-neutral-gray mt-1">
+                  Digunakan untuk generator copy AI (hanya Gemini yang didukung). Kunci tidak akan
+                  ditampilkan kembali. Jika server menggunakan variable lingkungan GEMINI_API_KEY,
+                  nilai yang Anda isi di sini akan diabaikan saat disimpan.
+                </p>
               </div>
               {/* Slot kosong untuk info fitur eksperimen Banana */}
               <div className="bg-gray-50 border border-dashed border-gray-200 rounded-lg p-3 text-xs text-neutral-gray">

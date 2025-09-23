@@ -8,8 +8,9 @@ export async function GET() {
   return Response.json({
     settings: {
       imageBgProvider: settings.imageBgProvider,
-      geminiApiKey: settings.geminiApiKey ? undefined : undefined,
-      hasGeminiKey: Boolean(settings.geminiApiKey),
+      // Never expose API keys to the client; only report availability flags
+      hasGeminiKey: Boolean(settings.geminiApiKey || process.env.GEMINI_API_KEY),
+      defaultAIProvider: settings.defaultAIProvider,
     },
   });
 }

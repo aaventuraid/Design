@@ -44,3 +44,6 @@ junit.xml
 .tmp
 Thumbs.db
 desktop.ini
+
+# App Data (Local settings, secrets cache)
+.data/

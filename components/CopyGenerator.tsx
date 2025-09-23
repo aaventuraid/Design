@@ -171,13 +171,33 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
             </div>
           </div>
 
+          {/* Experimental Banana Mode toggle */}
+          <div className="grid md:grid-cols-3 gap-4 items-end">
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-neutral-dark mb-2">
+                Mode Banana (Eksperimen)
+              </label>
+              <label className="flex items-center gap-3 p-3 border border-dashed border-gray-200 rounded-xl bg-gray-50 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={Boolean(options.bananaMode)}
+                  onChange={(e) => setOptions({ ...options, bananaMode: e.target.checked })}
+                  className="accent-primary-orange scale-110"
+                />
+                <span className="text-sm text-neutral-gray">
+                  Gaya bahasa ekstra catchy dan dinamis sesuai fitur baru Gemini.
+                </span>
+              </label>
+            </div>
+          </div>
+
           <div className="pt-2">
             <button
               onClick={generateCopy}
               disabled={loading || !options.productName.trim()}
               className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 ${loading || !options.productName.trim()
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-primary-orange to-primary-blue text-white hover:shadow-lg hover:scale-[1.02]'
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'bg-gradient-to-r from-primary-orange to-primary-blue text-white hover:shadow-lg hover:scale-[1.02]'
                 }`}
             >
               {loading ? (

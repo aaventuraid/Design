@@ -83,7 +83,7 @@ See detailed roadmaps:
 - **Framework**: Next.js 14 with App Router
 - **Styling**: Tailwind CSS
 - **Language**: TypeScript
-- **AI Integration**: Gemini & GitHub Models
+- **AI Integration**: Gemini (dengan fallback lokal). Dukungan mode eksperimen Banana.
 - **Image Processing**: Sharp
 
 ### 📝 Notes

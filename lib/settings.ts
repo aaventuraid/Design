@@ -7,8 +7,8 @@ const settingsPath = path.join(dataDir, 'settings.json');
 export type AppSettings = {
   // AI Configuration
   geminiApiKey?: string;
-  githubModelsApiKey?: string;
-  defaultAIProvider?: 'gemini' | 'github-models' | 'local';
+  // Only Gemini and Local are supported
+  defaultAIProvider?: 'gemini' | 'local';
 
   // Image Processing
   imageBgProvider?: 'internal' | 'external';
@@ -63,7 +63,6 @@ export async function getSettings(): Promise<AppSettings> {
       ...json,
       // Environment overrides
       geminiApiKey: process.env.GEMINI_API_KEY || json.geminiApiKey,
-      githubModelsApiKey: process.env.GITHUB_MODELS_API_KEY || json.githubModelsApiKey,
       imageBgProvider:
         (process.env.IMAGE_BG_PROVIDER as any) ||
         json.imageBgProvider ||
@@ -73,7 +72,6 @@ export async function getSettings(): Promise<AppSettings> {
     return {
       ...defaultSettings,
       geminiApiKey: process.env.GEMINI_API_KEY,
-      githubModelsApiKey: process.env.GITHUB_MODELS_API_KEY,
       imageBgProvider: (process.env.IMAGE_BG_PROVIDER as any) || 'internal',
     };
   }
@@ -87,7 +85,6 @@ export async function saveSettings(next: Partial<AppSettings>): Promise<AppSetti
   // Don't persist env-overridden values to file
   const toSave = { ...merged };
   if (process.env.GEMINI_API_KEY) delete toSave.geminiApiKey;
-  if (process.env.GITHUB_MODELS_API_KEY) delete toSave.githubModelsApiKey;
   if (process.env.IMAGE_BG_PROVIDER) delete toSave.imageBgProvider;
 
   await fs.writeFile(settingsPath, JSON.stringify(toSave, null, 2));
