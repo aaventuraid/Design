@@ -5,6 +5,8 @@ out
 dist
 build
 .turbo
+*.tsbuildinfo
+tsconfig.tsbuildinfo
 
 # Environment Variables & Secrets
 .env
