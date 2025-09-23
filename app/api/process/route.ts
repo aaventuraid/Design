@@ -19,10 +19,24 @@ export async function POST(req: NextRequest) {
 
     const arrayBuffer = await file.arrayBuffer();
     // Ensure processing in standard sRGB colorspace; avoid invalid 'rgb' target
-    let img = sharp(Buffer.from(arrayBuffer)).removeAlpha().toColorspace('srgb');
+    let img = sharp(Buffer.from(arrayBuffer)).toColorspace('srgb');
 
     // Convert to PNG with transparent background by detecting white-ish background and making it transparent
     // Simple heuristic: Use chroma-key against near-white
+    const meta = await img.metadata();
+    // If image is extremely small or metadata missing, skip chroma-key and return PNG directly
+    if (!meta.width || !meta.height || meta.width * meta.height < 4) {
+      const direct = await img.png({ compressionLevel: 9 }).toBuffer();
+      return new Response(new Uint8Array(direct), {
+        headers: new Headers({
+          'Content-Type': 'image/png',
+          'X-Marketplace': preset,
+          'X-Dimensions': `${meta.width || 1}x${meta.height || 1}`,
+          'X-Optimized-For': presetConfig.name,
+        }),
+      });
+    }
+
     const { data, info } = await img.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
     const key = { r: 255, g: 255, b: 255 };
     const tol = Math.max(0, Math.min(255, tolerance));
@@ -77,12 +91,7 @@ export async function POST(req: NextRequest) {
       ]);
     }
 
-    const png = await out
-      .png({
-        compressionLevel: 9,
-        quality: presetConfig.quality,
-      })
-      .toBuffer();
+    const png = await out.png({ compressionLevel: 9 }).toBuffer();
     const body = new Uint8Array(png);
 
     // Set response headers with marketplace info
