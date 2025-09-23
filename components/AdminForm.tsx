@@ -67,12 +67,27 @@ export default function AdminForm() {
     setSaving(true);
     setMessage(null);
     try {
+      if (!password.trim()) {
+        setMessage('❌ Masukkan kata sandi admin (default: admin)');
+        return;
+      }
+
       const res = await fetch('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
         body: JSON.stringify(settings),
       });
-      if (!res.ok) throw new Error(await res.text());
+
+      if (res.status === 401) {
+        setMessage('❌ Kata sandi admin salah');
+        return;
+      }
+
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error(t || 'Gagal menyimpan pengaturan');
+      }
+
       setMessage('✅ Pengaturan berhasil disimpan!');
       setTimeout(() => setMessage(null), 3000);
     } catch (e: any) {
@@ -94,14 +109,17 @@ export default function AdminForm() {
     <div className="space-y-6">
       {/* Admin Authentication */}
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <label className="block text-sm font-medium mb-2">🔐 Admin Password</label>
+        <label className="block text-sm font-medium mb-2">🔐 Kata Sandi Admin</label>
         <input
           type="password"
           className="border rounded-lg p-3 w-full max-w-xs focus:ring-2 focus:ring-primary-orange/20"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter admin password"
+          placeholder="Masukkan kata sandi admin (default: admin)"
         />
+        <p className="text-xs text-neutral-gray mt-2">
+          Diperlukan untuk menyimpan perubahan. Jika belum diatur, gunakan password default: <span className="font-semibold">admin</span>
+        </p>
       </div>
 
       {/* Tab Navigation */}
@@ -422,9 +440,9 @@ export default function AdminForm() {
           <button
             className="btn btn-primary px-8"
             onClick={save}
-            disabled={saving || !password.trim()}
+            disabled={saving}
           >
-            {saving ? '💾 Saving...' : '💾 Save Settings'}
+            {saving ? '💾 Menyimpan…' : '💾 Simpan Pengaturan'}
           </button>
 
           {message && (
@@ -437,9 +455,7 @@ export default function AdminForm() {
           )}
         </div>
 
-        <div className="text-xs text-neutral-gray">
-          Settings are automatically applied after saving
-        </div>
+        <div className="text-xs text-neutral-gray">Pengaturan akan otomatis diterapkan setelah disimpan</div>
       </div>
     </div>
   );
