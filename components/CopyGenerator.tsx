@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { showToast } from '@/lib/toast';
 import { type GeneratedCopy, type CopyGenerationOptions } from '@/lib/ai-service';
 
 interface CopyGeneratorProps {
@@ -31,11 +32,15 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
 
       if (!response.ok) throw new Error(await response.text());
       const result = await response.json();
+      if (Array.isArray(result.providers)) {
+        const gemini = result.providers.find((p: any) => p.name === 'Gemini' && p.available);
+        showToast(gemini ? 'Menggunakan Gemini' : 'Menggunakan Local Fallback', 'info');
+      }
       setCopy(result);
       onGenerate?.(result);
     } catch (error: any) {
       console.error('Copy generation failed:', error);
-      alert('Gagal generate copy: ' + error.message);
+      showToast('Gagal generate copy: ' + (error.message || 'Error'), 'error', 3000);
     } finally {
       setLoading(false);
     }
@@ -43,15 +48,7 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    // Menggunakan toast yang lebih profesional daripada alert
-    const toast = document.createElement('div');
-    toast.className =
-      'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300';
-    toast.textContent = 'Teks berhasil disalin!';
-    document.body.appendChild(toast);
-    setTimeout(() => {
-      toast.remove();
-    }, 2000);
+    showToast('Teks berhasil disalin!', 'success');
   };
 
   return (
@@ -195,10 +192,11 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
             <button
               onClick={generateCopy}
               disabled={loading || !options.productName.trim()}
-              className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 ${loading || !options.productName.trim()
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-primary-orange to-primary-blue text-white hover:shadow-lg hover:scale-[1.02]'
-                }`}
+              className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 ${
+                loading || !options.productName.trim()
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-primary-orange to-primary-blue text-white hover:shadow-lg hover:scale-[1.02]'
+              }`}
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-2">
