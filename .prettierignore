@@ -1,0 +1,8 @@
+.next/
+.next-dev/
+.next-build/
+node_modules/
+.husky/
+dist/
+coverage/
+package-lock.json

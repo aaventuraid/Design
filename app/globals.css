@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary-orange: 242 140 40; /* #F28C28 */
+  --color-primary-blue: 43 58 103; /* #2B3A67 */
+  --color-neutral-dark: 30 30 30; /* #1E1E1E */
+  --color-neutral-gray: 74 74 74; /* #4A4A4A */
+}
+
+body {
+  @apply bg-white text-neutral-dark;
+}
+
+.btn {
+  @apply rounded-xl px-4 py-2 font-semibold transition-colors;
+}
+
+.btn-primary {
+  @apply bg-[color:rgb(var(--color-primary-orange))] text-white hover:opacity-90;
+}
+
+.btn-secondary {
+  @apply bg-[color:rgb(var(--color-primary-blue))] text-white hover:opacity-90;
+}
