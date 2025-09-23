@@ -1,3 +1,5 @@
+import StatusIndicator from './StatusIndicator';
+
 export default function Footer() {
   return (
     <footer className="bg-gray-50 border-t border-gray-100 mt-16">
@@ -11,10 +13,7 @@ export default function Footer() {
           </div>
 
           <div className="flex items-center gap-6 text-xs text-neutral-gray">
-            <span className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              Sistem Aktif
-            </span>
+            <StatusIndicator />
             <span>Didesain sesuai panduan brand</span>
           </div>
         </div>
