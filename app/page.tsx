@@ -47,26 +47,65 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       {/* Hero Section */}
-      <section className="text-center space-y-3 py-8">
-        <div className="inline-block">
-          <h1
-            className="text-4xl md:text-5xl font-[700] text-transparent bg-gradient-to-r from-primary-orange to-primary-blue bg-clip-text"
-            style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
-          >
-            Studio Foto F&B Profesional
-          </h1>
+      <section className="text-center space-y-6 py-12">
+        <div className="space-y-4">
+          <div className="inline-block">
+            <h1
+              className="text-4xl md:text-6xl font-bold text-transparent bg-gradient-to-r from-primary-orange to-primary-blue bg-clip-text leading-tight"
+              style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
+            >
+              Studio Foto F&B Profesional
+            </h1>
+          </div>
+          <div className="w-24 h-1 bg-gradient-to-r from-primary-orange to-primary-blue mx-auto rounded-full"></div>
         </div>
-        <p className="text-lg text-neutral-gray max-w-3xl mx-auto leading-relaxed">
-          Transform foto makanan Yuki Yaki Corner jadi <strong>background transparan</strong> dan
-          tampil profesional. Optimized khusus untuk{' '}
-          <span className="text-primary-orange font-semibold">GoFood</span>,
-          <span className="text-primary-blue font-semibold"> GrabFood</span>, dan
-          <span className="text-primary-orange font-semibold"> ShopeeFood</span>.
+
+        <p className="text-xl text-neutral-dark max-w-4xl mx-auto leading-relaxed font-medium">
+          Transformasi foto makanan Yuki Yaki Corner menjadi{' '}
+          <strong className="text-primary-orange">background transparan</strong> dengan kualitas
+          profesional. Dioptimalkan khusus untuk platform marketplace terpopuler.
         </p>
-        <div className="flex justify-center gap-4 text-sm text-neutral-gray">
-          <span className="flex items-center gap-1">✨ Background removal</span>
-          <span className="flex items-center gap-1">🎨 Marketplace presets</span>
-          <span className="flex items-center gap-1">🤖 AI copy generation</span>
+
+        <div className="flex flex-wrap justify-center gap-6 pt-4">
+          <div className="flex items-center gap-2 bg-primary-orange/10 px-4 py-2 rounded-full">
+            <span className="text-primary-orange font-semibold">GoFood</span>
+          </div>
+          <div className="flex items-center gap-2 bg-primary-blue/10 px-4 py-2 rounded-full">
+            <span className="text-primary-blue font-semibold">GrabFood</span>
+          </div>
+          <div className="flex items-center gap-2 bg-primary-orange/10 px-4 py-2 rounded-full">
+            <span className="text-primary-orange font-semibold">ShopeeFood</span>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto pt-8">
+          <div className="flex flex-col items-center space-y-2 p-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-primary-orange to-primary-blue rounded-full flex items-center justify-center">
+              <span className="text-white text-xl">✨</span>
+            </div>
+            <h3 className="font-semibold text-neutral-dark">Hapus Background</h3>
+            <p className="text-sm text-neutral-gray text-center">
+              Otomatis menghilangkan background dengan presisi tinggi
+            </p>
+          </div>
+          <div className="flex flex-col items-center space-y-2 p-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-primary-blue to-primary-orange rounded-full flex items-center justify-center">
+              <span className="text-white text-xl">🎨</span>
+            </div>
+            <h3 className="font-semibold text-neutral-dark">Preset Marketplace</h3>
+            <p className="text-sm text-neutral-gray text-center">
+              Penyesuaian khusus untuk setiap platform
+            </p>
+          </div>
+          <div className="flex flex-col items-center space-y-2 p-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-primary-orange to-primary-blue rounded-full flex items-center justify-center">
+              <span className="text-white text-xl">🤖</span>
+            </div>
+            <h3 className="font-semibold text-neutral-dark">Generator Copy AI</h3>
+            <p className="text-sm text-neutral-gray text-center">
+              Buat judul dan deskripsi menarik secara otomatis
+            </p>
+          </div>
         </div>
       </section>
 
@@ -75,8 +114,16 @@ export default function HomePage() {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-600 font-medium">❌ {error}</p>
+        <div className="bg-red-50 border-l-4 border-red-400 rounded-r-lg p-4 shadow-sm">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <span className="text-red-400 text-xl">⚠️</span>
+            </div>
+            <div className="ml-3">
+              <p className="text-red-800 font-medium">Terjadi Kesalahan</p>
+              <p className="text-red-700 text-sm mt-1">{error}</p>
+            </div>
+          </div>
         </div>
       )}
 
@@ -92,40 +139,89 @@ export default function HomePage() {
       <CopyGenerator />
 
       {/* Tips Section */}
-      <section className="bg-gradient-to-br from-primary-blue/5 to-primary-orange/5 rounded-xl p-6">
-        <h3 className="font-semibold text-neutral-dark mb-4">💡 Tips untuk Hasil Terbaik</h3>
-        <div className="grid md:grid-cols-2 gap-4 text-sm">
-          <div className="space-y-2">
-            <p>
-              <strong>📸 Foto Berkualitas:</strong>
-            </p>
-            <ul className="text-neutral-gray ml-4 space-y-1">
-              <li>• Background putih/terang dan bersih</li>
-              <li>• Pencahayaan merata, tidak terlalu gelap</li>
-              <li>• Fokus tajam pada produk makanan</li>
-              <li>• Resolusi minimal 1024x1024px</li>
-            </ul>
+      <section className="bg-gradient-to-br from-primary-blue/5 via-white to-primary-orange/5 rounded-2xl p-8 border border-gray-100 shadow-sm">
+        <div className="text-center mb-8">
+          <h3 className="text-2xl font-bold text-neutral-dark mb-2">💡 Panduan Hasil Optimal</h3>
+          <p className="text-neutral-gray">
+            Ikuti tips berikut untuk mendapatkan foto produk terbaik
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-primary-orange/10 rounded-full flex items-center justify-center">
+                <span className="text-primary-orange text-lg">📸</span>
+              </div>
+              <h4 className="text-lg font-semibold text-neutral-dark">Kualitas Foto</h4>
+            </div>
+            <div className="space-y-3 ml-13">
+              <div className="flex items-start space-x-3">
+                <span className="text-primary-orange mt-1">•</span>
+                <p className="text-neutral-gray">Background putih atau terang yang bersih</p>
+              </div>
+              <div className="flex items-start space-x-3">
+                <span className="text-primary-orange mt-1">•</span>
+                <p className="text-neutral-gray">Pencahayaan merata dan tidak gelap</p>
+              </div>
+              <div className="flex items-start space-x-3">
+                <span className="text-primary-orange mt-1">•</span>
+                <p className="text-neutral-gray">Fokus tajam pada produk makanan</p>
+              </div>
+              <div className="flex items-start space-x-3">
+                <span className="text-primary-orange mt-1">•</span>
+                <p className="text-neutral-gray">
+                  Resolusi minimum <strong>1024×1024 piksel</strong>
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="space-y-2">
-            <p>
-              <strong>🎯 Platform Targeting:</strong>
-            </p>
-            <ul className="text-neutral-gray ml-4 space-y-1">
-              <li>
-                • <span className="text-primary-orange">GoFood:</span> Square 1080x1080, saturasi
-                tinggi
-              </li>
-              <li>
-                • <span className="text-primary-blue">GrabFood:</span> Landscape 1200x900, balanced
-              </li>
-              <li>
-                • <span className="text-primary-orange">ShopeeFood:</span> Square 800x800, compact
-              </li>
-              <li>
-                • <span className="text-primary-blue">Instagram:</span> Portrait 1080x1350 +
-                branding
-              </li>
-            </ul>
+
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-10 h-10 bg-primary-blue/10 rounded-full flex items-center justify-center">
+                <span className="text-primary-blue text-lg">🎯</span>
+              </div>
+              <h4 className="text-lg font-semibold text-neutral-dark">Target Platform</h4>
+            </div>
+            <div className="space-y-3 ml-13">
+              <div className="flex items-start space-x-3">
+                <span className="text-primary-orange mt-1">•</span>
+                <div>
+                  <p className="text-neutral-gray">
+                    <span className="font-medium text-primary-orange">GoFood:</span> Persegi
+                    1080×1080, saturasi tinggi
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <span className="text-primary-blue mt-1">•</span>
+                <div>
+                  <p className="text-neutral-gray">
+                    <span className="font-medium text-primary-blue">GrabFood:</span> Landscape
+                    1200×900, seimbang
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <span className="text-primary-orange mt-1">•</span>
+                <div>
+                  <p className="text-neutral-gray">
+                    <span className="font-medium text-primary-orange">ShopeeFood:</span> Persegi
+                    800×800, kompak
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <span className="text-primary-blue mt-1">•</span>
+                <div>
+                  <p className="text-neutral-gray">
+                    <span className="font-medium text-primary-blue">Instagram:</span> Potret
+                    1080×1350 + branding
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

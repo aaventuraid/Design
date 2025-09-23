@@ -1,6 +1,8 @@
 # Dependencies & Build Outputs
 node_modules
 .next
+.next-dev
+.next-build
 out
 dist
 build

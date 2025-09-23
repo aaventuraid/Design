@@ -60,7 +60,7 @@ export default function AdminForm() {
     fetch('/api/admin/settings')
       .then((r) => r.json())
       .then((d) => setSettings((s) => ({ ...s, ...d.settings })))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const save = async () => {
@@ -73,10 +73,10 @@ export default function AdminForm() {
         body: JSON.stringify(settings),
       });
       if (!res.ok) throw new Error(await res.text());
-      setMessage('✅ Settings saved successfully!');
+      setMessage('✅ Pengaturan berhasil disimpan!');
       setTimeout(() => setMessage(null), 3000);
     } catch (e: any) {
-      setMessage('❌ ' + (e.message || 'Failed to save settings'));
+      setMessage('❌ ' + (e.message || 'Gagal menyimpan pengaturan'));
     } finally {
       setSaving(false);
     }
@@ -111,11 +111,10 @@ export default function AdminForm() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${
-                activeTab === tab.id
+              className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${activeTab === tab.id
                   ? 'bg-primary-orange text-white border-b-2 border-primary-orange'
                   : 'text-neutral-gray hover:text-neutral-dark hover:bg-gray-50'
-              }`}
+                }`}
             >
               {tab.icon} {tab.label}
             </button>
@@ -430,9 +429,8 @@ export default function AdminForm() {
 
           {message && (
             <span
-              className={`text-sm font-medium ${
-                message.includes('✅') ? 'text-green-600' : 'text-red-600'
-              }`}
+              className={`text-sm font-medium ${message.includes('✅') ? 'text-green-600' : 'text-red-600'
+                }`}
             >
               {message}
             </span>

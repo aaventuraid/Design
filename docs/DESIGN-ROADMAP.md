@@ -5,6 +5,7 @@ Roadmap khusus untuk pengembangan design system dan user experience Yuki Yaki Co
 ## 🎯 Current State (v0.1.0)
 
 ### ✅ Existing Design Elements
+
 - **Brand Colors**: Orange (#F28C28) & Blue (#2B3A67)
 - **Typography**: Poppins, Montserrat, Inter
 - **Components**: Basic upload, preview, admin forms
@@ -12,6 +13,7 @@ Roadmap khusus untuk pengembangan design system dan user experience Yuki Yaki Co
 - **Accessibility**: Basic keyboard navigation
 
 ### 🚧 Design Debt
+
 - Inconsistent spacing system
 - Limited component library
 - No design tokens
@@ -23,6 +25,7 @@ Roadmap khusus untuk pengembangan design system dan user experience Yuki Yaki Co
 ## 🎨 Phase 1: Design Foundation (v0.2.0)
 
 ### Design System Creation
+
 - [ ] **Design Tokens**
   - Color palette expansion
   - Typography scale (8pt grid)
@@ -44,6 +47,7 @@ Roadmap khusus untuk pengembangan design system dan user experience Yuki Yaki Co
   - Icon documentation
 
 ### User Experience Improvements
+
 - [ ] **Onboarding Flow**
   - Interactive tour untuk first-time users
   - Progressive disclosure
@@ -61,6 +65,7 @@ Roadmap khusus untuk pengembangan design system dan user experience Yuki Yaki Co
 ## 📱 Phase 2: Mobile & Responsive (v0.3.0)
 
 ### Mobile-First Design
+
 - [ ] **Touch Interactions**
   - Gesture-based file upload
   - Swipe actions
@@ -74,6 +79,7 @@ Roadmap khusus untuk pengembangan design system dan user experience Yuki Yaki Co
   - Install prompts
 
 ### Cross-Platform Consistency
+
 - [ ] **Adaptive Design**
   - Device-specific layouts
   - Context-aware components
@@ -85,6 +91,7 @@ Roadmap khusus untuk pengembangan design system dan user experience Yuki Yaki Co
 ## 🌙 Phase 3: Advanced UI Features (v0.4.0)
 
 ### Theme System
+
 - [ ] **Dark Mode Support**
   - Automatic theme switching
   - User preference storage
@@ -98,6 +105,7 @@ Roadmap khusus untuk pengembangan design system dan user experience Yuki Yaki Co
   - Accessibility options
 
 ### Advanced Interactions
+
 - [ ] **Micro-interactions**
   - Loading states
   - Hover effects
@@ -115,6 +123,7 @@ Roadmap khusus untuk pengembangan design system dan user experience Yuki Yaki Co
 ## 🧪 UX Research & Testing Roadmap
 
 ### User Research
+
 - [ ] **User Personas**
   - F&B business owner profiles
   - Use case mapping
@@ -128,6 +137,7 @@ Roadmap khusus untuk pengembangan design system dan user experience Yuki Yaki Co
   - Conversion funnel optimization
 
 ### Accessibility Compliance
+
 - [ ] **WCAG 2.1 AA**
   - Screen reader compatibility
   - Keyboard navigation
@@ -136,4 +146,4 @@ Roadmap khusus untuk pengembangan design system dan user experience Yuki Yaki Co
 
 ---
 
-*This design roadmap complements the main technical roadmap and ensures user-centered development.*
+_This design roadmap complements the main technical roadmap and ensures user-centered development._

@@ -29,7 +29,7 @@ ENV NODE_ENV=production
 
 # Non-root user
 RUN addgroup --system --gid 1001 nodejs \
-	&& adduser --system --uid 1001 nextjs
+    && adduser --system --uid 1001 nextjs
 
 # Copy public and built output only
 COPY --from=builder /app/public ./public

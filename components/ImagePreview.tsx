@@ -11,117 +11,173 @@ export default function ImagePreview({
   loading?: boolean;
   currentPreset?: MarketplacePreset;
 }) {
-  if (!original && !processed) return null;
+  if (!original && !processed && !loading) return null;
 
   const presetConfig = getPresetConfig(currentPreset);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Preview Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-neutral-dark">Preview Hasil</h3>
+      <div className="text-center space-y-2">
+        <h3 className="text-2xl font-bold text-neutral-dark">Hasil Pemrosesan</h3>
         {processed && (
           <div className="text-sm text-neutral-gray">
-            Optimized untuk <strong className="text-primary-orange">{presetConfig.name}</strong>•{' '}
-            {presetConfig.dimensions.width}×{presetConfig.dimensions.height}
+            Dioptimalkan untuk{' '}
+            <span className="font-semibold text-primary-orange">{presetConfig.name}</span> •{' '}
+            <span className="font-mono">
+              {presetConfig.dimensions.width}×{presetConfig.dimensions.height}
+            </span>
           </div>
         )}
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Original Image */}
-        <figure className="border-2 border-gray-200 rounded-xl p-4 bg-white">
-          <figcaption className="text-sm font-medium mb-3 text-neutral-dark flex items-center gap-2">
-            📷 Foto Asli
-          </figcaption>
-          {original ? (
-            <div className="bg-gray-50 rounded-lg overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={original}
-                alt="Original"
-                className="w-full h-auto object-contain max-h-80"
-              />
+        <div className="group">
+          <div className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-semibold text-neutral-dark flex items-center gap-2">
+                <span className="text-lg">📷</span>
+                Foto Asli
+              </h4>
             </div>
-          ) : (
-            <div className="text-neutral-gray text-sm bg-gray-50 rounded-lg p-8 text-center">
-              Belum ada gambar
-            </div>
-          )}
-        </figure>
 
-        {/* Processed Image */}
-        <figure className="border-2 border-primary-orange/20 rounded-xl p-4 bg-white">
-          <figcaption className="text-sm font-medium mb-3 text-neutral-dark flex items-center gap-2">
-            ✨ Hasil Proses
-            {processed && (
-              <span className="text-xs bg-primary-orange/10 text-primary-orange px-2 py-1 rounded">
-                PNG
-              </span>
-            )}
-          </figcaption>
-          {loading ? (
-            <div className="bg-gray-50 rounded-lg p-8 text-center">
-              <div className="animate-spin w-8 h-8 border-4 border-primary-orange border-t-transparent rounded-full mx-auto mb-2"></div>
-              <p className="text-neutral-gray text-sm">Memproses gambar...</p>
-            </div>
-          ) : processed ? (
-            <div className="space-y-3">
-              <div className="bg-gray-50 rounded-lg overflow-hidden">
+            {original ? (
+              <div className="bg-gray-50 rounded-xl overflow-hidden border">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={processed}
-                  alt="Processed"
+                  src={original}
+                  alt="Foto asli"
                   className="w-full h-auto object-contain max-h-80"
                 />
               </div>
-
-              {/* Download Actions */}
-              <div className="flex gap-2">
-                <a
-                  href={processed}
-                  download={`yuki-yaki-${currentPreset}-${Date.now()}.png`}
-                  className="btn btn-primary flex-1 text-center"
-                >
-                  📥 Unduh PNG
-                </a>
-                <button
-                  onClick={() => navigator.clipboard.writeText(processed)}
-                  className="btn btn-secondary px-3"
-                  title="Copy image URL"
-                >
-                  📋
-                </button>
+            ) : (
+              <div className="bg-gray-50 rounded-xl p-12 text-center border-2 border-dashed border-gray-300">
+                <span className="text-4xl text-gray-300 block mb-2">🖼️</span>
+                <p className="text-neutral-gray text-sm">Belum ada foto yang diunggah</p>
               </div>
+            )}
+          </div>
+        </div>
 
-              {/* Image Info */}
-              <div className="text-xs text-neutral-gray bg-gray-50 rounded p-2">
-                <div className="grid grid-cols-2 gap-2">
-                  <span>
-                    Platform: <strong>{presetConfig.name}</strong>
+        {/* Processed Image */}
+        <div className="group">
+          <div className="bg-white border-2 border-primary-orange/20 rounded-2xl p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-semibold text-neutral-dark flex items-center gap-2">
+                <span className="text-lg">✨</span>
+                Hasil Proses
+              </h4>
+              {processed && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs bg-primary-orange/10 text-primary-orange px-2 py-1 rounded-full font-medium">
+                    PNG
                   </span>
-                  <span>
-                    Quality: <strong>{presetConfig.quality}%</strong>
-                  </span>
-                  <span>
-                    Dimensions: <strong>{presetConfig.dimensions.aspectRatio}</strong>
-                  </span>
-                  <span>
-                    Max Size:{' '}
-                    <strong>
-                      {presetConfig.fileSize.max}
-                      {presetConfig.fileSize.unit}
-                    </strong>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                    Transparan
                   </span>
                 </div>
+              )}
+            </div>
+
+            {loading ? (
+              <div className="bg-gray-50 rounded-xl p-12 text-center border-2 border-dashed border-gray-300">
+                <div className="w-12 h-12 mx-auto mb-4">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-orange border-t-transparent"></div>
+                </div>
+                <p className="text-neutral-dark font-medium mb-1">Memproses Foto...</p>
+                <p className="text-neutral-gray text-sm">
+                  Sedang menghilangkan background dan mengoptimalkan kualitas
+                </p>
               </div>
-            </div>
-          ) : (
-            <div className="text-neutral-gray text-sm bg-gray-50 rounded-lg p-8 text-center">
-              Upload gambar untuk melihat hasil
-            </div>
-          )}
-        </figure>
+            ) : processed ? (
+              <div className="space-y-4">
+                <div className="bg-gray-50 rounded-xl overflow-hidden border relative">
+                  {/* Checkerboard background to show transparency */}
+                  <div
+                    className="absolute inset-0 opacity-20"
+                    style={{
+                      backgroundImage: `repeating-conic-gradient(#666 0% 25%, transparent 0% 50%) 50% / 20px 20px`,
+                    }}
+                  ></div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={processed}
+                    alt="Hasil proses dengan background transparan"
+                    className="relative w-full h-auto object-contain max-h-80"
+                  />
+                </div>
+
+                {/* Download Actions */}
+                <div className="flex gap-3">
+                  <a
+                    href={processed}
+                    download={`yuki-yaki-${currentPreset}-${Date.now()}.png`}
+                    className="flex-1 bg-gradient-to-r from-primary-orange to-primary-blue text-white py-3 px-4 rounded-xl font-semibold text-center hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <span>📥</span>
+                      Unduh PNG
+                    </div>
+                  </a>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(processed);
+                      const toast = document.createElement('div');
+                      toast.className =
+                        'fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                      toast.textContent = 'URL gambar disalin!';
+                      document.body.appendChild(toast);
+                      setTimeout(() => toast.remove(), 2000);
+                    }}
+                    className="px-4 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                    title="Salin URL gambar"
+                  >
+                    <span className="text-xl">📋</span>
+                  </button>
+                </div>
+
+                {/* Image Info */}
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 border">
+                  <h5 className="font-medium text-neutral-dark mb-2 flex items-center gap-2">
+                    <span className="text-sm">ℹ️</span>
+                    Informasi Hasil
+                  </h5>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <span className="text-neutral-gray">Platform:</span>
+                      <p className="font-semibold text-primary-orange">{presetConfig.name}</p>
+                    </div>
+                    <div>
+                      <span className="text-neutral-gray">Kualitas:</span>
+                      <p className="font-semibold text-primary-blue">{presetConfig.quality}%</p>
+                    </div>
+                    <div>
+                      <span className="text-neutral-gray">Rasio:</span>
+                      <p className="font-semibold text-neutral-dark">
+                        {presetConfig.dimensions.aspectRatio}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-neutral-gray">Ukuran Max:</span>
+                      <p className="font-semibold text-green-600">
+                        {presetConfig.fileSize.max}
+                        {presetConfig.fileSize.unit}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-gray-50 rounded-xl p-12 text-center border-2 border-dashed border-gray-300">
+                <span className="text-4xl text-gray-300 block mb-2">⏳</span>
+                <p className="text-neutral-gray text-sm">
+                  Hasil akan muncul di sini setelah pemrosesan
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

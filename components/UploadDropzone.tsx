@@ -16,35 +16,17 @@ export default function UploadDropzone({
   const [preset, setPreset] = useState<MarketplacePreset>('gofood');
   const [branding, setBranding] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-  
-  // 🆕 NEW FEATURE: Batch upload (tidak merusak single upload)
-  const [batchMode, setBatchMode] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
-  
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const presetOptions = getPresetOptions();
 
   const handleFiles = useCallback(
     (files?: FileList | null) => {
       if (!files || files.length === 0) return;
-      
-      // 🆕 ENHANCED: Support both single and batch upload
-      if (batchMode && files.length > 1) {
-        // New batch processing logic
-        Array.from(files).forEach((file, index) => {
-          setTimeout(() => {
-            onFile(file, { tolerance, preset, branding });
-            setUploadProgress(((index + 1) / files.length) * 100);
-          }, index * 1000); // Process with 1s delay
-        });
-      } else {
-        // ✅ EXISTING: Single file upload (unchanged)
-        const f = files[0];
-        onFile(f, { tolerance, preset, branding });
-      }
+      const file = files[0];
+      onFile(file, { tolerance, preset, branding });
     },
-    [onFile, tolerance, preset, branding, batchMode],
+    [onFile, tolerance, preset, branding],
   );
 
   const handleDragEnter = useCallback((e: React.DragEvent) => {
@@ -85,11 +67,14 @@ export default function UploadDropzone({
   }, [loading]);
 
   return (
-    <div className="grid md:grid-cols-[1fr,320px] gap-4">
+    <div className="space-y-6">
+      {/* Upload Area */}
       <div
-        className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${dragActive
-            ? 'border-primary-orange bg-primary-orange/5'
-            : 'border-primary-blue/30 hover:bg-gray-50 hover:border-primary-orange/50'
+        className={`relative border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-300 ${dragActive
+            ? 'border-primary-orange bg-primary-orange/5 scale-[1.02] shadow-lg'
+            : loading
+              ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
+              : 'border-primary-blue/30 hover:bg-gradient-to-br hover:from-primary-blue/5 hover:to-primary-orange/5 hover:border-primary-orange/50 hover:shadow-md'
           }`}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -112,116 +97,123 @@ export default function UploadDropzone({
           className="hidden"
           onChange={(e) => handleFiles(e.target.files)}
           disabled={loading}
-          multiple={batchMode} // 🆕 NEW: Enable multiple when batch mode active
         />
-        <div className="space-y-3">
-          <div className="text-4xl">📸</div>
-          <div>
-            <p className="font-semibold text-lg text-neutral-dark">
-              Tarik & letakkan gambar atau klik untuk unggah
-            </p>
-            <p className="text-sm text-neutral-gray mt-1">
-              PNG/JPG sampai 8MB • Hasil optimal dengan background putih/bersih
+
+        <div className="space-y-6">
+          <div className="flex justify-center">
+            <div className="w-20 h-20 bg-gradient-to-r from-primary-orange to-primary-blue rounded-2xl flex items-center justify-center">
+              <span className="text-white text-3xl">📸</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-2xl font-bold text-neutral-dark">
+              {loading ? 'Memproses Foto...' : 'Unggah Foto Makanan'}
+            </h3>
+            <p className="text-neutral-gray max-w-md mx-auto">
+              {loading
+                ? 'Sedang memproses foto Anda dengan teknologi AI terbaru'
+                : 'Tarik & letakkan file atau klik untuk memilih foto dari perangkat Anda'}
             </p>
           </div>
-          <button
-            type="button"
-            className="btn btn-primary text-lg px-6 py-3"
-            disabled={loading}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClick();
-            }}
-          >
-            {loading ? 'Memproses…' : 'Pilih Gambar'}
-          </button>
+
+          {!loading && (
+            <div className="space-y-4">
+              <button
+                type="button"
+                className="bg-gradient-to-r from-primary-orange to-primary-blue text-white font-semibold px-8 py-3 rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-105"
+                disabled={loading}
+              >
+                Pilih Foto
+              </button>
+
+              <div className="text-xs text-neutral-gray space-y-1">
+                <p>📁 Format: PNG, JPG, JPEG (maksimal 8MB)</p>
+                <p>✨ Rekomendasi: Background putih/terang untuk hasil optimal</p>
+              </div>
+            </div>
+          )}
+
+          {loading && (
+            <div className="space-y-4">
+              <div className="w-12 h-12 mx-auto">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-orange border-t-transparent"></div>
+              </div>
+              <p className="text-sm text-neutral-gray">Harap tunggu...</p>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="border rounded-xl p-4 space-y-4 bg-gray-50">
-        <h3 className="font-semibold text-neutral-dark">Pengaturan</h3>
+      {/* Settings Panel */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+        <h4 className="font-semibold text-neutral-dark mb-6 flex items-center gap-2">
+          <span className="text-lg">⚙️</span>
+          Pengaturan Proses
+        </h4>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">Platform Target</label>
-          <select
-            value={preset}
-            onChange={(e) => setPreset(e.target.value as MarketplacePreset)}
-            className="w-full border rounded-lg p-3 bg-white focus:ring-2 focus:ring-primary-orange/20 focus:border-primary-orange"
-          >
-            {presetOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <p className="text-xs text-neutral-gray mt-1">
-            {presetOptions.find((p) => p.value === preset)?.description}
-          </p>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-2">Background Removal Tolerance</label>
-          <input
-            type="range"
-            min={0}
-            max={60}
-            value={tolerance}
-            onChange={(e) => setTolerance(parseInt(e.target.value))}
-            className="w-full accent-primary-orange"
-          />
-          <div className="flex justify-between text-xs text-neutral-gray mt-1">
-            <span>Ketat (0)</span>
-            <span className="font-medium">{tolerance}</span>
-            <span>Longgar (60)</span>
-          </div>
-        </div>
-
-        <div>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={branding}
-              onChange={(e) => setBranding(e.target.checked)}
-              className="accent-primary-orange"
-            />
-            <span className="text-sm">Tambah branding Yuki Yaki Corner</span>
-          </label>
-          <p className="text-xs text-neutral-gray mt-1">
-            Border brand color untuk Instagram & media sosial
-          </p>
-        </div>
-
-        {/* 🆕 NEW FEATURE: Batch Upload Toggle */}
-        <div>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={batchMode}
-              onChange={(e) => setBatchMode(e.target.checked)}
-              className="accent-primary-orange"
-            />
-            <span className="text-sm">🔥 Batch Upload (Multiple Files)</span>
-          </label>
-          <p className="text-xs text-neutral-gray mt-1">
-            Upload beberapa gambar sekaligus dengan pengaturan yang sama
-          </p>
-        </div>
-
-        {/* 🆕 NEW: Progress Bar for Batch Upload */}
-        {batchMode && uploadProgress > 0 && uploadProgress < 100 && (
+        <div className="space-y-6">
           <div>
-            <div className="flex justify-between text-xs text-neutral-gray mb-1">
-              <span>Progress Upload</span>
-              <span>{Math.round(uploadProgress)}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-primary-orange h-2 rounded-full transition-all duration-300"
-                style={{ width: `${uploadProgress}%` }}
-              ></div>
-            </div>
+            <label className="block text-sm font-medium text-neutral-dark mb-3">
+              Platform Target
+            </label>
+            <select
+              value={preset}
+              onChange={(e) => setPreset(e.target.value as MarketplacePreset)}
+              className="w-full border border-gray-200 rounded-xl p-3 bg-white focus:ring-2 focus:ring-primary-orange/20 focus:border-primary-orange transition-colors"
+            >
+              {presetOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-neutral-gray mt-2">
+              {presetOptions.find((p) => p.value === preset)?.description}
+            </p>
           </div>
-        )}
+
+          <div>
+            <label className="block text-sm font-medium text-neutral-dark mb-3">
+              Toleransi Penghapusan Background
+            </label>
+            <input
+              type="range"
+              min={0}
+              max={60}
+              value={tolerance}
+              onChange={(e) => setTolerance(parseInt(e.target.value))}
+              className="w-full accent-primary-orange h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            />
+            <div className="flex justify-between text-xs text-neutral-gray mt-2">
+              <span>Ketat (0)</span>
+              <span className="font-medium bg-primary-orange/10 px-2 py-1 rounded">
+                {tolerance}
+              </span>
+              <span>Longgar (60)</span>
+            </div>
+            <p className="text-xs text-neutral-gray mt-2">
+              Nilai tinggi untuk background yang sulit dihapus
+            </p>
+          </div>
+
+          <div>
+            <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-gray-50 transition-colors">
+              <input
+                type="checkbox"
+                checked={branding}
+                onChange={(e) => setBranding(e.target.checked)}
+                className="w-5 h-5 accent-primary-orange rounded"
+              />
+              <div className="flex-1">
+                <span className="text-sm font-medium text-neutral-dark">Tambahkan Branding</span>
+                <p className="text-xs text-neutral-gray">
+                  Sisipkan elemen brand Yuki Yaki Corner pada hasil foto
+                </p>
+              </div>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,9 +1,30 @@
 export default function Footer() {
   return (
-    <footer className="border-t">
-      <div className="container mx-auto px-4 py-6 text-sm text-neutral-gray flex items-center justify-between">
-        <p>© {new Date().getFullYear()} Yuki Yaki Corner</p>
-        <p>Didesain sesuai brand guideline</p>
+    <footer className="bg-gray-50 border-t border-gray-100 mt-16">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col items-center md:items-start">
+            <p className="text-sm text-neutral-dark font-medium">
+              © {new Date().getFullYear()} Yuki Yaki Corner
+            </p>
+            <p className="text-xs text-neutral-gray">Studio Foto F&B Profesional</p>
+          </div>
+
+          <div className="flex items-center gap-6 text-xs text-neutral-gray">
+            <span className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              Sistem Aktif
+            </span>
+            <span>Didesain sesuai panduan brand</span>
+          </div>
+        </div>
+
+        <div className="mt-6 pt-4 border-t border-gray-200 text-center">
+          <p className="text-xs text-neutral-gray">
+            Transformasi foto makanan menjadi aset visual berkualitas tinggi untuk platform
+            marketplace
+          </p>
+        </div>
       </div>
     </footer>
   );
