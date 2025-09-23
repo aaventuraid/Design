@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 type Settings = {
   // AI Configuration
   geminiApiKey?: string;
-  githubModelsApiKey?: string;
-  defaultAIProvider?: 'gemini' | 'github-models' | 'local';
+  defaultAIProvider?: 'gemini' | 'local';
 
   // Image Processing
   imageBgProvider?: 'internal' | 'external';
@@ -130,8 +129,8 @@ export default function AdminForm() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${activeTab === tab.id
-                  ? 'bg-primary-orange text-white border-b-2 border-primary-orange'
-                  : 'text-neutral-gray hover:text-neutral-dark hover:bg-gray-50'
+                ? 'bg-primary-orange text-white border-b-2 border-primary-orange'
+                : 'text-neutral-gray hover:text-neutral-dark hover:bg-gray-50'
                 }`}
             >
               {tab.icon} {tab.label}
@@ -154,21 +153,13 @@ export default function AdminForm() {
                   className="border rounded-lg p-3 w-full focus:ring-2 focus:ring-primary-orange/20"
                   value={settings.geminiApiKey || ''}
                   onChange={(e) => setSettings({ ...settings, geminiApiKey: e.target.value })}
-                  placeholder="Enter your Gemini API key"
+                  placeholder="Masukkan Gemini API key"
                 />
-                <p className="text-xs text-neutral-gray mt-1">For advanced AI copy generation</p>
+                <p className="text-xs text-neutral-gray mt-1">Digunakan untuk generator copy AI (hanya Gemini yang didukung)</p>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">GitHub Models API Key</label>
-                <input
-                  type="password"
-                  className="border rounded-lg p-3 w-full focus:ring-2 focus:ring-primary-orange/20"
-                  value={settings.githubModelsApiKey || ''}
-                  onChange={(e) => setSettings({ ...settings, githubModelsApiKey: e.target.value })}
-                  placeholder="Enter your GitHub Models API key"
-                />
-                <p className="text-xs text-neutral-gray mt-1">Fallback AI provider</p>
+              {/* Slot kosong untuk info fitur eksperimen Banana */}
+              <div className="bg-gray-50 border border-dashed border-gray-200 rounded-lg p-3 text-xs text-neutral-gray">
+                Dukungan mode eksperimen <span className="font-semibold">Banana</span> pada Gemini dapat diaktifkan di UI generator (akan ditambahkan). Tidak perlu konfigurasi tambahan di sini.
               </div>
             </div>
 
@@ -181,8 +172,7 @@ export default function AdminForm() {
                   setSettings({ ...settings, defaultAIProvider: e.target.value as any })
                 }
               >
-                <option value="gemini">Gemini (Primary)</option>
-                <option value="github-models">GitHub Models</option>
+                <option value="gemini">Gemini (Utama)</option>
                 <option value="local">Local Fallback</option>
               </select>
             </div>

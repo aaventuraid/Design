@@ -224,3 +224,9 @@ Refactor (Jika Perlu): Perbaiki atau sederhanakan kode yang dihasilkan Copilot.
 Commit: Hanya commit kode yang sudah Anda pahami dan setujui sepenuhnya.
 
 Dengan menerapkan kerangka kerja ini, Anda mengubah hubungan Anda dengan Copilot. Anda tidak lagi hanya menjadi pengguna, tetapi menjadi seorang manajer AI yang secara sistematis memastikan kualitas outputnya.
+
+Catatan Penting: Integrasi Gemini sebagai Satu-satunya Penyedia AI
+- Proyek ini hanya menggunakan Gemini untuk fitur AI. Jangan menulis integrasi untuk provider lain.
+- Jangan pernah commit API key ke repository. Gunakan environment variable GEMINI_API_KEY atau simpan melalui halaman Admin (tersimpan ke .data/settings.json jika tidak dioverride env).
+- Endpoint yang memanggil AI: app/api/generate-copy/route.ts menggunakan AIService (lib/ai-service.ts) yang memanggil Gemini via REST. Jika GEMINI_API_KEY tidak tersedia, sistem jatuh ke local fallback.
+- Fitur Eksperimen “Banana”: aktifkan dengan field bananaMode: true pada payload generate copy untuk gaya bahasa yang lebih catchy/dinamis. UI pendukung dapat ditambahkan di komponen CopyGenerator.

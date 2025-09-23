@@ -15,6 +15,8 @@ export interface CopyGenerationOptions {
   tone: 'casual' | 'professional' | 'playful' | 'premium';
   language: 'id' | 'en';
   platform: 'gofood' | 'grabfood' | 'shopeefood' | 'instagram' | 'general';
+  // Optional experimental toggle for new Gemini behavior
+  bananaMode?: boolean;
 }
 
 export interface GeneratedCopy {
@@ -41,10 +43,10 @@ export class AIService {
         apiKey: this.geminiKey,
         available: Boolean(this.geminiKey),
       },
+      // Always expose Local fallback so UI can indicate offline capability
       {
-        name: 'GitHub Models',
-        apiKey: this.githubKey,
-        available: Boolean(this.githubKey),
+        name: 'Local',
+        available: true,
       },
     ];
   }
@@ -58,15 +60,6 @@ export class AIService {
         return await this.callGemini(prompt, options);
       } catch (error) {
         console.error('Gemini API failed:', error);
-      }
-    }
-
-    // Fallback to GitHub Models
-    if (this.githubKey) {
-      try {
-        return await this.callGitHubModels(prompt, options);
-      } catch (error) {
-        console.error('GitHub Models API failed:', error);
       }
     }
 
@@ -93,6 +86,23 @@ ${options.price ? `Price: Rp ${options.price.toLocaleString('id-ID')}` : ''}
 ${options.specialFeatures?.length ? `Special Features: ${options.specialFeatures.join(', ')}` : ''}
 `;
 
+    const jsonSchemaInstruction = `
+You MUST respond strictly as minified JSON that conforms to this TypeScript type with no extra prose:
+{
+  "title": string,
+  "description": string,
+  "hashtags": string[],
+  "callToAction": string,
+  "brandMessage": string
+}
+`;
+
+    const bananaNote = options.bananaMode
+      ? options.language === 'id'
+        ? 'Aktifkan mode BANANA: gunakan gaya ekstra catchy, dinamis, dan fun; prioritaskan kata kerja yang energik.'
+        : 'Enable BANANA mode: extra catchy, dynamic, and fun tone; prioritize energetic verbs.'
+      : '';
+
     const instructions =
       options.language === 'id'
         ? `
@@ -104,6 +114,9 @@ Generate marketing copy in Indonesian for a food delivery platform. Create:
 5. Brand message that reflects Yuki Yaki Corner's identity
 
 Make it appetizing, authentic to the brand, and optimized for ${options.platform}.
+${bananaNote}
+
+${jsonSchemaInstruction}
 `
         : `
 Generate marketing copy in English for a food delivery platform. Create:
@@ -114,23 +127,83 @@ Generate marketing copy in English for a food delivery platform. Create:
 5. Brand message that reflects Yuki Yaki Corner's identity
 
 Make it appetizing, authentic to the brand, and optimized for ${options.platform}.
+${bananaNote}
+
+${jsonSchemaInstruction}
 `;
 
     return brandContext + productContext + instructions;
   }
 
   private async callGemini(prompt: string, options: CopyGenerationOptions): Promise<GeneratedCopy> {
-    // TODO: Implement actual Gemini API call
-    // For now, return enhanced local generation
+    if (!this.geminiKey) return this.generateLocalCopy(options);
+
+    const model = 'gemini-1.5-flash';
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.geminiKey}`;
+
+    const body = {
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: prompt }],
+        },
+      ],
+      generationConfig: {
+        temperature: options.bananaMode ? 1.1 : 0.8,
+        topP: 0.9,
+        maxOutputTokens: 512,
+      },
+    } as const;
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Gemini API error ${res.status}: ${text}`);
+    }
+
+    const data = (await res.json()) as any;
+    const text: string | undefined = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (text) {
+      // Try to parse strict JSON; strip code fences if present
+      const cleaned = text
+        .trim()
+        .replace(/^```(json)?/i, '')
+        .replace(/```$/i, '')
+        .trim();
+      try {
+        const parsed = JSON.parse(cleaned);
+        // Basic normalization
+        return {
+          title: String(parsed.title || ''),
+          description: String(parsed.description || ''),
+          hashtags: Array.isArray(parsed.hashtags)
+            ? parsed.hashtags.map((h: any) => String(h))
+            : [],
+          callToAction: String(parsed.callToAction || 'Pesan Sekarang'),
+          brandMessage: String(parsed.brandMessage || ''),
+        };
+      } catch {
+        // Fallback: attempt to heuristically build a copy
+        return this.generateLocalCopy(options);
+      }
+    }
+
     return this.generateLocalCopy(options);
   }
 
+  // Deprecated: GitHub Models fallback disabled; keeping stub for potential future use
   private async callGitHubModels(
-    prompt: string,
+    _prompt: string,
     options: CopyGenerationOptions,
   ): Promise<GeneratedCopy> {
-    // TODO: Implement actual GitHub Models API call
-    // For now, return enhanced local generation
     return this.generateLocalCopy(options);
   }
 

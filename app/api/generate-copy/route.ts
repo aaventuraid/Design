@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
       tone: options.tone || 'casual',
       language: options.language || 'id',
       platform: options.platform || 'gofood',
+      bananaMode: options.bananaMode || false,
     });
 
     return Response.json({

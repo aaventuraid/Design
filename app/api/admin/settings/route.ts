@@ -9,9 +9,7 @@ export async function GET() {
     settings: {
       imageBgProvider: settings.imageBgProvider,
       geminiApiKey: settings.geminiApiKey ? undefined : undefined,
-      githubModelsApiKey: settings.githubModelsApiKey ? undefined : undefined,
       hasGeminiKey: Boolean(settings.geminiApiKey),
-      hasGithubModelsKey: Boolean(settings.githubModelsApiKey),
     },
   });
 }
