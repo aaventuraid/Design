@@ -1,8 +1,42 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import os from 'os';
 
-const dataDir = path.join(process.cwd(), '.data');
-const settingsPath = path.join(dataDir, 'settings.json');
+// Resolve candidate storage directories (env override -> project .data -> tmp)
+function getDataDirs() {
+  const envDir = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : null;
+  const projectDir = path.join(process.cwd(), '.data');
+  const tmpDir = path.join(os.tmpdir(), 'yyc-data');
+  return [envDir, projectDir, tmpDir].filter(Boolean) as string[];
+}
+
+async function readFirstExisting(paths: string[]): Promise<string | null> {
+  for (const p of paths) {
+    try {
+      const raw = await fs.readFile(p, 'utf-8');
+      return raw;
+    } catch {
+      /* continue */
+    }
+  }
+  return null;
+}
+
+async function writeWithFallback(fileNames: string[], content: string): Promise<string> {
+  let lastError: any;
+  for (const file of fileNames) {
+    try {
+      const dir = path.dirname(file);
+      await fs.mkdir(dir, { recursive: true });
+      await fs.writeFile(file, content);
+      return file;
+    } catch (e: any) {
+      lastError = e;
+      continue;
+    }
+  }
+  throw lastError || new Error('Failed to write settings to any data directory');
+}
 
 export type AppSettings = {
   // AI Configuration
@@ -55,9 +89,10 @@ const defaultSettings: AppSettings = {
 };
 
 export async function getSettings(): Promise<AppSettings> {
+  const candidates = getDataDirs().map((d) => path.join(d, 'settings.json'));
   try {
-    const raw = await fs.readFile(settingsPath, 'utf-8');
-    const json = JSON.parse(raw);
+    const raw = await readFirstExisting(candidates);
+    const json = raw ? JSON.parse(raw) : {};
     return {
       ...defaultSettings,
       ...json,
@@ -78,7 +113,6 @@ export async function getSettings(): Promise<AppSettings> {
 }
 
 export async function saveSettings(next: Partial<AppSettings>): Promise<AppSettings> {
-  await fs.mkdir(dataDir, { recursive: true });
   const current = await getSettings();
   const merged: AppSettings = { ...current, ...next };
 
@@ -86,7 +120,7 @@ export async function saveSettings(next: Partial<AppSettings>): Promise<AppSetti
   const toSave = { ...merged };
   if (process.env.GEMINI_API_KEY) delete toSave.geminiApiKey;
   if (process.env.IMAGE_BG_PROVIDER) delete toSave.imageBgProvider;
-
-  await fs.writeFile(settingsPath, JSON.stringify(toSave, null, 2));
+  const candidates = getDataDirs().map((d) => path.join(d, 'settings.json'));
+  await writeWithFallback(candidates, JSON.stringify(toSave, null, 2));
   return merged;
 }

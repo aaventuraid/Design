@@ -16,11 +16,16 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const adminPass = process.env.ADMIN_PASSWORD || 'admin';
-  const provided = req.headers.get('x-admin-password') || '';
-  if (provided !== adminPass) return new Response('Unauthorized', { status: 401 });
-  const body = await req.json().catch(() => null);
-  if (!body) return new Response('Invalid JSON', { status: 400 });
-  const updated = await saveSettings(body);
-  return Response.json({ settings: updated });
+  try {
+    const adminPass = process.env.ADMIN_PASSWORD || 'admin';
+    const provided = req.headers.get('x-admin-password') || '';
+    if (provided !== adminPass) return new Response('Unauthorized', { status: 401 });
+    const body = await req.json().catch(() => null);
+    if (!body) return new Response('Invalid JSON', { status: 400 });
+    const updated = await saveSettings(body);
+    return Response.json({ settings: updated });
+  } catch (e: any) {
+    console.error('Save settings error:', e);
+    return Response.json({ error: e?.message || 'Failed to save settings' }, { status: 500 });
+  }
 }
