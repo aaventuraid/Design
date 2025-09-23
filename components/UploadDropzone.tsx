@@ -16,6 +16,11 @@ export default function UploadDropzone({
   const [preset, setPreset] = useState<MarketplacePreset>('gofood');
   const [branding, setBranding] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  
+  // 🆕 NEW FEATURE: Batch upload (tidak merusak single upload)
+  const [batchMode, setBatchMode] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const presetOptions = getPresetOptions();
@@ -23,10 +28,23 @@ export default function UploadDropzone({
   const handleFiles = useCallback(
     (files?: FileList | null) => {
       if (!files || files.length === 0) return;
-      const f = files[0];
-      onFile(f, { tolerance, preset, branding });
+      
+      // 🆕 ENHANCED: Support both single and batch upload
+      if (batchMode && files.length > 1) {
+        // New batch processing logic
+        Array.from(files).forEach((file, index) => {
+          setTimeout(() => {
+            onFile(file, { tolerance, preset, branding });
+            setUploadProgress(((index + 1) / files.length) * 100);
+          }, index * 1000); // Process with 1s delay
+        });
+      } else {
+        // ✅ EXISTING: Single file upload (unchanged)
+        const f = files[0];
+        onFile(f, { tolerance, preset, branding });
+      }
     },
-    [onFile, tolerance, preset, branding],
+    [onFile, tolerance, preset, branding, batchMode],
   );
 
   const handleDragEnter = useCallback((e: React.DragEvent) => {
@@ -94,6 +112,7 @@ export default function UploadDropzone({
           className="hidden"
           onChange={(e) => handleFiles(e.target.files)}
           disabled={loading}
+          multiple={batchMode} // 🆕 NEW: Enable multiple when batch mode active
         />
         <div className="space-y-3">
           <div className="text-4xl">📸</div>
@@ -171,6 +190,38 @@ export default function UploadDropzone({
             Border brand color untuk Instagram & media sosial
           </p>
         </div>
+
+        {/* 🆕 NEW FEATURE: Batch Upload Toggle */}
+        <div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={batchMode}
+              onChange={(e) => setBatchMode(e.target.checked)}
+              className="accent-primary-orange"
+            />
+            <span className="text-sm">🔥 Batch Upload (Multiple Files)</span>
+          </label>
+          <p className="text-xs text-neutral-gray mt-1">
+            Upload beberapa gambar sekaligus dengan pengaturan yang sama
+          </p>
+        </div>
+
+        {/* 🆕 NEW: Progress Bar for Batch Upload */}
+        {batchMode && uploadProgress > 0 && uploadProgress < 100 && (
+          <div>
+            <div className="flex justify-between text-xs text-neutral-gray mb-1">
+              <span>Progress Upload</span>
+              <span>{Math.round(uploadProgress)}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-primary-orange h-2 rounded-full transition-all duration-300"
+                style={{ width: `${uploadProgress}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
