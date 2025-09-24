@@ -1,0 +1,14 @@
+# Reduce build context and avoid copying dev artifacts
+.git
+.next
+.next-dev
+node_modules
+npm-debug.log
+Dockerfile
+.dockerignore
+.env
+.env.*
+*.tsbuildinfo
+coverage
+.vscode
+.DS_Store

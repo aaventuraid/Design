@@ -1,0 +1,22 @@
+# Coolify Deployment Configuration
+
+# This file helps Coolify understand how to deploy the Next.js application
+# Place this in the root of your repository
+
+# Build Command: npm run build
+# Start Command: npm run start
+# Port: 3000
+
+# Environment Variables needed:
+# NODE_ENV=production
+# ADMIN_PASSWORD=your_admin_password
+# GEMINI_API_KEY=your_gemini_key (optional)
+# GITHUB_MODELS_API_KEY=your_github_key (optional)
+
+# Docker ignore patterns for Coolify
+.next-dev/
+.git/
+node_modules/
+*.tsbuildinfo
+.env.local
+.DS_Store

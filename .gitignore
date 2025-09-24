@@ -1,0 +1,55 @@
+# Dependencies & Build Outputs
+node_modules
+.next
+.next-dev
+.next-build
+out
+dist
+build
+.turbo
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Database Files
+*.db
+*.db-journal
+prisma/dev.db*
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+*.env
+
+# Package Manager Files
+pnpm-lock.yaml
+yarn.lock
+
+# Development & IDE Files
+.vscode/settings.json
+.vscode/launch.json
+.DS_Store
+*.log
+*.tsbuildinfo
+.cache
+
+# Testing & Coverage
+coverage
+.nyc_output
+test-results
+junit.xml
+
+# Temporary & System Files
+*.tmp
+*.temp
+.tmp
+Thumbs.db
+desktop.ini
+
+# App Data (Local settings, secrets cache)
+.data/
+
+/generated/prisma
