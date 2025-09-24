@@ -1,5 +1,5 @@
 # Dockerfile optimized for Coolify deployment with database support
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Install system dependencies for Prisma and Sharp
 RUN apk add --no-cache libc6-compat openssl
@@ -40,8 +40,8 @@ RUN npx prisma generate
 
 # Copy source and build
 COPY . .
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
 RUN npm run build
 
 # ----------------------
@@ -50,8 +50,8 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Non-root user
 RUN addgroup --system --gid 1001 nodejs \

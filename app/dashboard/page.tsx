@@ -3,6 +3,7 @@
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 export default function DashboardPage() {
   const { user, token, isLoading } = useAuth();
@@ -152,12 +153,12 @@ export default function DashboardPage() {
           <p className="text-blue-700 mb-4">
             Ubah foto makanan Anda menjadi profesional untuk platform marketplace
           </p>
-          <a
+          <Link
             href="/"
             className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Mulai Proses
-          </a>
+          </Link>
         </div>
 
         <div className="bg-green-50 rounded-lg p-6">
@@ -165,12 +166,12 @@ export default function DashboardPage() {
           <p className="text-green-700 mb-4">
             Buat deskripsi produk yang menarik dengan bantuan AI
           </p>
-          <a
+          <Link
             href="/#copy-generator"
             className="inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
             Generate Copy
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -178,12 +179,12 @@ export default function DashboardPage() {
         <div className="mt-8 bg-red-50 rounded-lg p-6">
           <h3 className="text-lg font-medium text-red-900 mb-2">Admin Panel</h3>
           <p className="text-red-700 mb-4">Akses pengaturan sistem dan analytics global</p>
-          <a
+          <Link
             href="/admin"
             className="inline-block px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
             Buka Admin Panel
-          </a>
+          </Link>
         </div>
       )}
     </div>
