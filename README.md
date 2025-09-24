@@ -1,62 +1,70 @@
-# Yuki Yaki Corner – Studio Foto F&B
+# 🍽️ Yuki Yaki Corner - AI-Powered F&B Content Generator
 
-Web app untuk mengubah 1 foto makanan menjadi transparan dan meningkatkan kualitas foto sesuai brand Yuki Yaki Corner. Hasil siap untuk GoFood, GrabFood, dan ShopeeFood.
+**Production-Ready**: Next.js application yang mengubah 1 foto makanan menjadi konten marketing siap pakai dengan AI copy generation, background removal otomatis, dan optimasi untuk platform F&B marketplace.
 
-## Fitur Utama
+## 📋 **Complete Documentation**
 
-- Upload gambar, auto hapus background putih/terang (heuristik), ekspor PNG transparan
-- Preset enhancement khusus F&B (brightness, saturation, sharpen)
-- Admin panel: atur API key Gemini dan opsi provider background
-- Brand theme: warna, tipografi sesuai panduan
-- Generator copy produk via Gemini (dengan opsi eksperimen Banana)
+🎯 **[PROJECT-GUIDE.md](./PROJECT-GUIDE.md)** - **PANDUAN LENGKAP** project overview, architecture, roadmap, dan development guide
 
-## Prasyarat
+🚀 **[docs/DEPLOY-COOLIFY-SIMPLE.md](./docs/DEPLOY-COOLIFY-SIMPLE.md)** - **DEPLOYMENT GUIDE** untuk production
 
-- Node.js 18+ dan npm/pnpm
+## ✨ Current Features (v1.0.0)
 
-## Konfigurasi
+- ✅ **Smart Background Removal** - Otomatis hapus background putih/terang
+- ✅ **AI Copy Generation** - Generate judul & deskripsi produk dengan Gemini AI
+- ✅ **Marketplace Presets** - GoFood, GrabFood, ShopeeFood, Instagram optimization
+- ✅ **Database-First Architecture** - Settings & credentials aman di database
+- ✅ **Multi-User Support** - Admin panel dengan role-based access (USER/PREMIUM/ADMIN)
+- ✅ **Production Ready** - Docker, security audit compliant, comprehensive documentation
 
-- Buat file `.env.local` berdasarkan `.env.example`.
-- Set `GEMINI_API_KEY` untuk mengaktifkan AI generator (atau isi via halaman Admin).
+## ⚡ Quick Start
 
-## Development
+### Development Setup
 
 ```bash
+# 1. Install dependencies
 npm install
+
+# 2. Setup environment
+cp .env.example .env.local
+# Edit .env.local dengan database credentials
+
+# 3. Database setup
+npx prisma generate
+npx prisma db push
+npx prisma db seed
+
+# 4. Start development
 npm run dev
+# Open http://localhost:3000
 ```
 
-Buka http://localhost:3000 di browser.
+### Production Deployment
 
-## Dokumentasi
+```bash
+# 1. Build application
+npm run build
 
-📚 Lengkap ada di folder [`docs/`](./docs/):
+# 2. Deploy to Coolify (recommended)
+# See complete guide in docs/DEPLOY-COOLIFY-SIMPLE.md
+```
 
-- [README.md](./docs/README.md)
-- [ROADMAP.md](./docs/ROADMAP.md)
-- [DESIGN-ROADMAP.md](./docs/DESIGN-ROADMAP.md)
+## 🏗️ Architecture
 
-## Deployment
+**Database-First Design**: Settings & API keys stored securely in database
+**Tech Stack**: Next.js 14 + TypeScript + Tailwind + Prisma + PostgreSQL
+**AI Integration**: Gemini API (primary) dengan local fallback
+**Security**: JWT auth, bcrypt hashing, rate limiting, audit logs
+**DevOps**: Docker ready, Coolify optimized, comprehensive monitoring
 
-Lihat panduan di folder docs:
+## 🔗 Links & Resources
 
-- [DEPLOY-GUIDE-EN.md](./docs/DEPLOY-GUIDE-EN.md)
-- [PANDUAN-DEPLOY-NETLIFY.md](./docs/PANDUAN-DEPLOY-NETLIFY.md)
-- [PANDUAN-COOLIFY-FIX.md](./docs/PANDUAN-COOLIFY-FIX.md)
+**Repository**: https://github.com/aaventuraid/Design.git  
+**Documentation**: Complete guides in [`docs/`](./docs/) folder  
+**Admin Panel**: `/admin` (post-deployment)  
+**API Health**: `/api/health` (monitoring endpoint)
 
-## Tech Stack
+## 📄 License
 
-- Framework: Next.js 14 (App Router)
-- Styling: Tailwind CSS
-- Language: TypeScript
-- AI: Gemini (satu-satunya provider; fallback lokal tersedia)
-- Image Processing: Sharp
-
-## Catatan
-
-- Penghapusan background menggunakan pendekatan heuristik (chroma key putih). Untuk kualitas studio, integrasikan layanan khusus (rembg/segmentation ML) — provider `imageBgProvider` sudah disiapkan.
-- Fitur eksperimen Banana: aktifkan di Generator Copy (toggle), membuat gaya bahasa lebih catchy/dinamis.
-
-## Lisensi
-
-Proprietary – internal Yuki Yaki Corner.
+Proprietary – Internal Yuki Yaki Corner Studio  
+© 2025 - AI-Powered F&B Content Generation Platform
