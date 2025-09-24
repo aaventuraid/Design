@@ -15,7 +15,13 @@
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
     "db:reset": "prisma migrate reset",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "docker:build": "docker build -t yuki-yaki-corner .",
+    "docker:run": "docker run -p 3000:3000 --env-file .env yuki-yaki-corner",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f app",
+    "coolify:setup": "chmod +x scripts/coolify-start.sh"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",

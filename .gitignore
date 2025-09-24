@@ -10,6 +10,11 @@ build
 *.tsbuildinfo
 tsconfig.tsbuildinfo
 
+# Database Files
+*.db
+*.db-journal
+prisma/dev.db*
+
 # Environment Variables & Secrets
 .env
 .env.local
@@ -22,7 +27,6 @@ tsconfig.tsbuildinfo
 # Package Manager Files
 pnpm-lock.yaml
 yarn.lock
-package-lock.json
 
 # Development & IDE Files
 .vscode/settings.json
