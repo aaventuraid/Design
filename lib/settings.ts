@@ -3,7 +3,7 @@ import path from 'path';
 import os from 'os';
 
 // Resolve candidate storage directories (env override -> project .data -> tmp)
-function getDataDirs() {
+export function getDataDirs() {
   const envDir = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : null;
   const projectDir = path.join(process.cwd(), '.data');
   const tmpDir = path.join(os.tmpdir(), 'yyc-data');
@@ -36,6 +36,38 @@ async function writeWithFallback(fileNames: string[], content: string): Promise<
     }
   }
   throw lastError || new Error('Failed to write settings to any data directory');
+}
+
+export async function getStorageInfo(): Promise<{
+  candidates: string[];
+  using?: string | null;
+  writable: { dir: string; ok: boolean }[];
+}> {
+  const dirs = getDataDirs();
+  const candidates = dirs.map((d) => path.join(d, 'settings.json'));
+  let using: string | null = null;
+  for (const c of candidates) {
+    try {
+      await fs.stat(c);
+      using = c;
+      break;
+    } catch {
+      /* not found */
+    }
+  }
+  const writable = await Promise.all(
+    dirs.map(async (d) => {
+      try {
+        await fs.mkdir(d, { recursive: true });
+        // Try access write; if not supported, attempt a harmless touch
+        await fs.access(d, (fs as any).constants?.W_OK ?? 2);
+        return { dir: d, ok: true };
+      } catch {
+        return { dir: d, ok: false };
+      }
+    }),
+  );
+  return { candidates, using, writable };
 }
 
 export type AppSettings = {

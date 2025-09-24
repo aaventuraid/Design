@@ -54,12 +54,20 @@ export default function AdminForm() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('ai');
+  const [storageInfo, setStorageInfo] = useState<{
+    candidates: string[];
+    using?: string | null;
+    writable: { dir: string; ok: boolean }[];
+  } | null>(null);
 
   useEffect(() => {
     fetch('/api/admin/settings')
       .then((r) => r.json())
-      .then((d) => setSettings((s) => ({ ...s, ...d.settings })))
-      .catch(() => { });
+      .then((d) => {
+        setSettings((s) => ({ ...s, ...d.settings }));
+        if (d.storage) setStorageInfo(d.storage);
+      })
+      .catch(() => {});
   }, []);
 
   const save = async () => {
@@ -117,7 +125,8 @@ export default function AdminForm() {
           placeholder="Masukkan kata sandi admin (default: admin)"
         />
         <p className="text-xs text-neutral-gray mt-2">
-          Diperlukan untuk menyimpan perubahan. Jika belum diatur, gunakan password default: <span className="font-semibold">admin</span>
+          Diperlukan untuk menyimpan perubahan. Jika belum diatur, gunakan password default:{' '}
+          <span className="font-semibold">admin</span>
         </p>
       </div>
 
@@ -128,10 +137,11 @@ export default function AdminForm() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${activeTab === tab.id
-                ? 'bg-primary-orange text-white border-b-2 border-primary-orange'
-                : 'text-neutral-gray hover:text-neutral-dark hover:bg-gray-50'
-                }`}
+              className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${
+                activeTab === tab.id
+                  ? 'bg-primary-orange text-white border-b-2 border-primary-orange'
+                  : 'text-neutral-gray hover:text-neutral-dark hover:bg-gray-50'
+              }`}
             >
               {tab.icon} {tab.label}
             </button>
@@ -163,7 +173,9 @@ export default function AdminForm() {
               </div>
               {/* Slot kosong untuk info fitur eksperimen Banana */}
               <div className="bg-gray-50 border border-dashed border-gray-200 rounded-lg p-3 text-xs text-neutral-gray">
-                Dukungan mode eksperimen <span className="font-semibold">Banana</span> pada Gemini dapat diaktifkan di UI generator (akan ditambahkan). Tidak perlu konfigurasi tambahan di sini.
+                Dukungan mode eksperimen <span className="font-semibold">Banana</span> pada Gemini
+                dapat diaktifkan di UI generator (akan ditambahkan). Tidak perlu konfigurasi
+                tambahan di sini.
               </div>
             </div>
 
@@ -431,25 +443,37 @@ export default function AdminForm() {
       {/* Save Actions */}
       <div className="flex items-center justify-between pt-4 border-t">
         <div className="flex items-center gap-4">
-          <button
-            className="btn btn-primary px-8"
-            onClick={save}
-            disabled={saving}
-          >
+          <button className="btn btn-primary px-8" onClick={save} disabled={saving}>
             {saving ? '💾 Menyimpan…' : '💾 Simpan Pengaturan'}
           </button>
 
           {message && (
             <span
-              className={`text-sm font-medium ${message.includes('✅') ? 'text-green-600' : 'text-red-600'
-                }`}
+              className={`text-sm font-medium ${
+                message.includes('✅') ? 'text-green-600' : 'text-red-600'
+              }`}
             >
               {message}
             </span>
           )}
         </div>
-
-        <div className="text-xs text-neutral-gray">Pengaturan akan otomatis diterapkan setelah disimpan</div>
+        <div className="text-xs text-neutral-gray text-right">
+          <div>Pengaturan akan otomatis diterapkan setelah disimpan</div>
+          {storageInfo && (
+            <div className="mt-1">
+              <div className="font-medium text-neutral-dark">Storage</div>
+              <div>Using: {storageInfo.using || 'Belum ada (dibuat saat pertama simpan)'}</div>
+              <div className="mt-1">Writable:</div>
+              <ul className="list-disc ml-5">
+                {storageInfo.writable.map((w) => (
+                  <li key={w.dir} className={w.ok ? 'text-green-700' : 'text-red-700'}>
+                    {w.dir} {w.ok ? '✓' : '✗'}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

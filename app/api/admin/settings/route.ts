@@ -1,10 +1,11 @@
 import { NextRequest } from 'next/server';
-import { getSettings, saveSettings } from '@/lib/settings';
+import { getSettings, saveSettings, getStorageInfo } from '@/lib/settings';
 
 export const runtime = 'nodejs';
 
 export async function GET() {
   const settings = await getSettings();
+  const storage = await getStorageInfo();
   return Response.json({
     settings: {
       imageBgProvider: settings.imageBgProvider,
@@ -12,6 +13,7 @@ export async function GET() {
       hasGeminiKey: Boolean(settings.geminiApiKey || process.env.GEMINI_API_KEY),
       defaultAIProvider: settings.defaultAIProvider,
     },
+    storage,
   });
 }
 

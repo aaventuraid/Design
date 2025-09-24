@@ -14,6 +14,11 @@ export default function ImagePreview({
   if (!original && !processed && !loading) return null;
 
   const presetConfig = getPresetConfig(currentPreset);
+  const isPng = presetConfig.format === 'png';
+  const showsTransparency =
+    isPng && presetConfig.allowTransparency && !presetConfig.flattenBackground;
+  const fileExt = isPng ? 'png' : 'jpg';
+  const mimeLabel = isPng ? 'PNG' : 'JPEG';
 
   return (
     <div className="space-y-6">
@@ -71,11 +76,13 @@ export default function ImagePreview({
               {processed && (
                 <div className="flex items-center gap-2">
                   <span className="text-xs bg-primary-orange/10 text-primary-orange px-2 py-1 rounded-full font-medium">
-                    PNG
+                    {mimeLabel}
                   </span>
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
-                    Transparan
-                  </span>
+                  {showsTransparency && (
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                      Transparan
+                    </span>
+                  )}
                 </div>
               )}
             </div>
@@ -93,17 +100,19 @@ export default function ImagePreview({
             ) : processed ? (
               <div className="space-y-4">
                 <div className="bg-gray-50 rounded-xl overflow-hidden border relative">
-                  {/* Checkerboard background to show transparency */}
-                  <div
-                    className="absolute inset-0 opacity-20"
-                    style={{
-                      backgroundImage: `repeating-conic-gradient(#666 0% 25%, transparent 0% 50%) 50% / 20px 20px`,
-                    }}
-                  ></div>
+                  {/* Checkerboard background only when transparency is expected */}
+                  {showsTransparency && (
+                    <div
+                      className="absolute inset-0 opacity-20"
+                      style={{
+                        backgroundImage: `repeating-conic-gradient(#666 0% 25%, transparent 0% 50%) 50% / 20px 20px`,
+                      }}
+                    ></div>
+                  )}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={processed}
-                    alt="Hasil proses dengan background transparan"
+                    alt="Hasil proses"
                     className="relative w-full h-auto object-contain max-h-80"
                   />
                 </div>
@@ -112,12 +121,12 @@ export default function ImagePreview({
                 <div className="flex gap-3">
                   <a
                     href={processed}
-                    download={`yuki-yaki-${currentPreset}-${Date.now()}.png`}
+                    download={`yuki-yaki-${currentPreset}-${Date.now()}.${fileExt}`}
                     className="flex-1 bg-gradient-to-r from-primary-orange to-primary-blue text-white py-3 px-4 rounded-xl font-semibold text-center hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
                   >
                     <div className="flex items-center justify-center gap-2">
                       <span>📥</span>
-                      Unduh PNG
+                      Unduh {mimeLabel}
                     </div>
                   </a>
                   <button

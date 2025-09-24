@@ -1,4 +1,10 @@
-export type MarketplacePreset = 'gofood' | 'grabfood' | 'shopeefood' | 'instagram' | 'general';
+export type MarketplacePreset =
+  | 'gofood'
+  | 'grabfood'
+  | 'grabfood_cover'
+  | 'shopeefood'
+  | 'instagram'
+  | 'general';
 
 export interface MarketplaceConfig {
   name: string;
@@ -10,6 +16,11 @@ export interface MarketplaceConfig {
     sharpness: number;
     contrast: number;
   };
+  // Output/Compliance
+  format: 'jpeg' | 'png';
+  flattenBackground: boolean; // flatten transparency to backgroundColor
+  backgroundColor: string; // used when flattening or padding
+  allowTransparency: boolean;
   branding?: {
     watermark: boolean;
     brandColors: boolean;
@@ -24,6 +35,10 @@ export const MarketplacePresets: Record<MarketplacePreset, MarketplaceConfig> = 
     name: 'GoFood',
     dimensions: { width: 1080, height: 1080, aspectRatio: '1:1' },
     quality: 90,
+    format: 'jpeg',
+    flattenBackground: true,
+    backgroundColor: '#FFFFFF',
+    allowTransparency: false,
     optimization: {
       brightness: 1.08,
       saturation: 1.15,
@@ -41,13 +56,18 @@ export const MarketplacePresets: Record<MarketplacePreset, MarketplaceConfig> = 
   },
   grabfood: {
     name: 'GrabFood',
-    dimensions: { width: 1200, height: 900, aspectRatio: '4:3' },
-    quality: 85,
+    // Menu item photos: 1:1; Store cover commonly 9:5 (disiapkan terpisah di masa depan)
+    dimensions: { width: 1200, height: 1200, aspectRatio: '1:1' },
+    quality: 86,
+    format: 'jpeg',
+    flattenBackground: true,
+    backgroundColor: '#FFFFFF',
+    allowTransparency: false,
     optimization: {
-      brightness: 1.06,
-      saturation: 1.12,
-      sharpness: 1.1,
-      contrast: 1.03,
+      brightness: 1.07,
+      saturation: 1.14,
+      sharpness: 1.18,
+      contrast: 1.05,
     },
     branding: {
       watermark: false,
@@ -55,12 +75,40 @@ export const MarketplacePresets: Record<MarketplacePreset, MarketplaceConfig> = 
       logoOverlay: false,
     },
     fileSize: { max: 1.5, unit: 'MB' },
-    description: 'Optimized untuk GrabFood - format landscape dengan enhancement balanced',
+    description:
+      'Optimized untuk GrabFood - foto menu 1:1 dengan enhancement balanced dan background putih',
+  },
+  grabfood_cover: {
+    name: 'GrabFood Cover',
+    // Store cover commonly uses 9:5 banner
+    dimensions: { width: 1800, height: 1000, aspectRatio: '9:5' },
+    quality: 85,
+    format: 'jpeg',
+    flattenBackground: true,
+    backgroundColor: '#FFFFFF',
+    allowTransparency: false,
+    optimization: {
+      brightness: 1.06,
+      saturation: 1.12,
+      sharpness: 1.15,
+      contrast: 1.04,
+    },
+    branding: {
+      watermark: false,
+      brandColors: true,
+      logoOverlay: false,
+    },
+    fileSize: { max: 2, unit: 'MB' },
+    description: 'Banner cover GrabFood (9:5) dengan background putih dan visual bersih',
   },
   shopeefood: {
     name: 'ShopeeFood',
     dimensions: { width: 800, height: 800, aspectRatio: '1:1' },
     quality: 88,
+    format: 'jpeg',
+    flattenBackground: true,
+    backgroundColor: '#FFFFFF',
+    allowTransparency: false,
     optimization: {
       brightness: 1.05,
       saturation: 1.18,
@@ -79,6 +127,10 @@ export const MarketplacePresets: Record<MarketplacePreset, MarketplaceConfig> = 
     name: 'Instagram',
     dimensions: { width: 1080, height: 1350, aspectRatio: '4:5' },
     quality: 92,
+    format: 'jpeg',
+    flattenBackground: true,
+    backgroundColor: '#FFFFFF',
+    allowTransparency: false,
     optimization: {
       brightness: 1.1,
       saturation: 1.25,
@@ -97,6 +149,10 @@ export const MarketplacePresets: Record<MarketplacePreset, MarketplaceConfig> = 
     name: 'General',
     dimensions: { width: 1024, height: 1024, aspectRatio: '1:1' },
     quality: 85,
+    format: 'png',
+    flattenBackground: false,
+    backgroundColor: '#FFFFFF',
+    allowTransparency: true,
     optimization: {
       brightness: 1.05,
       saturation: 1.12,
