@@ -1,5 +1,18 @@
 # 📖 Dokumentasi Yuki Yaki Corner
 
+Selamat datang di dokumentasi lengkap aplikasi AI-powered food content generator!
+
+## 🎯 **PANDUAN UTAMA**
+
+- **[PROJECT-GUIDE.md](../PROJECT-GUIDE.md)** - 📋 **COMPLETE PROJECT GUIDE** - Overview, roadmap, dan panduan lengkap
+- **[DEPLOY-COOLIFY-SIMPLE.md](./DEPLOY-COOLIFY-SIMPLE.md)** - 🚀 **DEPLOYMENT GUIDE** - Deploy ke production
+
+## 🔧 **TECHNICAL DOCUMENTATION**
+
+- **[DATABASE-FIRST-ARCHITECTURE.md](./DATABASE-FIRST-ARCHITECTURE.md)** - Database-first architecture explanation
+- **[SECURITY-AUDIT.md](./SECURITY-AUDIT.md)** - Security implementation & audit report
+- **[PANDUAN-UPDATE-EFISIEN.md](./PANDUAN-UPDATE-EFISIEN.md)** - Maintenance & update guideki Yaki Corner
+
 Selamat datang di dokumentasi lengkap aplikasi image processing dan copy generator!
 
 ## � Deployment
