@@ -128,6 +128,20 @@ postgresql://yuki_admin:password@yuki-yaki-db:5432/yuki_yaki_prod
 
 ```
 DATABASE_URL=postgresql://yuki_admin:password@yuki-yaki-db:5432/yuki_yaki_prod
+NEXTAUTH_SECRET=K8mJ9vN2pQ4rS7wX1aB6cE9fH3kL8mP5qR7tU0vY2zA4bC6dF9gH1jK3mN6pQ8sT
+NEXTAUTH_URL=https://domain-anda.com
+NODE_ENV=production
+```
+
+**Variables opsional:**
+
+```
+INITIAL_ADMIN_EMAIL=admin@domain-anda.com
+INITIAL_ADMIN_PASSWORD=AdminPassword123!
+```
+
+```
+DATABASE_URL=postgresql://yuki_admin:password@yuki-yaki-db:5432/yuki_yaki_prod
 GEMINI_API_KEY=your_gemini_api_key_here
 NEXTAUTH_SECRET=random_string_minimal_32_karakter
 NEXTAUTH_URL=https://domain-anda.com
@@ -141,15 +155,7 @@ INITIAL_ADMIN_EMAIL=admin@domain-anda.com
 INITIAL_ADMIN_PASSWORD=AdminPassword123!
 ```
 
-### 4.2 Cara Dapat API Key Gemini
-
-1. Buka [Google AI Studio](https://aistudio.google.com/)
-2. Login dengan akun Google
-3. Klik **"Get API Key"**
-4. Klik **"Create API Key"**
-5. Copy API key yang dihasilkan
-
-### 4.3 Generate NEXTAUTH_SECRET
+### 4.2 Generate NEXTAUTH_SECRET
 
 ```bash
 # Di terminal/command prompt
@@ -157,6 +163,8 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 ```
 
 Copy hasilnya ke `NEXTAUTH_SECRET`
+
+**Catatan:** Gemini API key akan diatur nanti melalui admin panel, bukan di environment variables.
 
 ---
 
@@ -239,11 +247,20 @@ Buka: `https://domain-anda.com/api/health`
 }
 ```
 
-### 7.3 Test Admin Panel
+### 7.3 Setup Admin Panel & Gemini API
 
 1. Buka: `https://domain-anda.com/admin`
 2. Login dengan `INITIAL_ADMIN_EMAIL` dan `INITIAL_ADMIN_PASSWORD`
 3. Harus bisa masuk ke dashboard admin
+4. **Setup Gemini API Key:**
+   - Buka [Google AI Studio](https://aistudio.google.com/)
+   - Login dengan akun Google
+   - Klik "Get API Key" → "Create API Key"
+   - Copy API key yang dihasilkan
+   - Kembali ke admin panel aplikasi
+   - Di section "AI Settings", masukkan Gemini API key
+   - Klik "Save Settings"
+   - Test generate copy untuk memastikan API berfungsi
 
 ---
 
@@ -277,9 +294,10 @@ Buka: `https://domain-anda.com/api/health`
 
 **Solusi:**
 
-1. Cek GEMINI_API_KEY valid
+1. Cek Gemini API key sudah diset di admin panel
 2. Cek NEXTAUTH_SECRET ada (min 32 karakter)
 3. Lihat logs aplikasi di Coolify
+4. Test Gemini API key di admin settings
 
 ### ❌ SSL Error
 
@@ -326,7 +344,9 @@ Untuk update di masa depan:
 - [ ] API health returns OK
 - [ ] Database terkoneksi
 - [ ] Admin panel berfungsi
-- [ ] Features utama berjalan normal
+- [ ] Gemini API key diset di admin panel
+- [ ] Test generate copy berfungsi
+- [ ] Test upload gambar berfungsi
 
 ---
 
