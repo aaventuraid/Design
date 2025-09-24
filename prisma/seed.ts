@@ -6,47 +6,45 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // Create admin user - REQUIRES environment variables for production
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD;
+  // Create default admin user only if no users exist
+  const userCount = await prisma.user.count();
 
-  if (!adminEmail || !adminPassword) {
-    console.error(
-      '❌ ADMIN_EMAIL and ADMIN_PASSWORD environment variables are required for seeding',
-    );
-    throw new Error('Missing required environment variables for admin account creation');
-  }
+  if (userCount === 0) {
+    console.log('🔐 Creating default admin user...');
 
-  const existingAdmin = await prisma.user.findUnique({
-    where: { email: adminEmail },
-  });
-
-  if (!existingAdmin) {
-    const passwordHash = await bcrypt.hash(adminPassword, 12);
+    // Use default credentials that must be changed after first login
+    const defaultEmail = 'admin@localhost';
+    const defaultPassword = 'admin123';
+    const passwordHash = await bcrypt.hash(defaultPassword, 12);
 
     const admin = await prisma.user.create({
       data: {
-        email: adminEmail,
+        email: defaultEmail,
+        username: 'admin',
         passwordHash,
         role: 'ADMIN',
+        isActive: true,
         preferences: {
           theme: 'light',
           language: 'id',
+          notifications: true,
         },
       },
     });
 
-    console.log(`✅ Admin user created: ${admin.email}`);
+    console.log(`✅ Default admin user created: ${admin.email}`);
+    console.log(`🔑 Default password: ${defaultPassword}`);
+    console.log(`⚠️  IMPORTANT: Change credentials after first login!`);
   } else {
-    console.log(`ℹ️  Admin user already exists: ${existingAdmin.email}`);
+    console.log(`ℹ️  Database already has ${userCount} user(s), skipping admin creation`);
   }
 
-  // Create some system settings
+  // Create some default system settings (admin akan set API key nanti)
   const defaultSettings = [
     {
       key: 'geminiApiKey',
-      value: process.env.GEMINI_API_KEY || '',
-      description: 'Gemini API key for AI features',
+      value: '', // Will be set by admin through admin panel
+      description: 'Gemini API key for AI features - Set this in Admin Panel',
       category: 'ai',
     },
     {

@@ -34,12 +34,30 @@ export class AIService {
     this.geminiKey = geminiKey;
   }
 
-  getAvailableProviders(): AIProvider[] {
+  // Get Gemini API key from database (fallback to constructor param)
+  private async getGeminiKey(): Promise<string | undefined> {
+    if (this.geminiKey) {
+      return this.geminiKey;
+    }
+
+    try {
+      const { getSettings } = await import('./settings');
+      const settings = await getSettings();
+      return settings.geminiApiKey || undefined;
+    } catch (error) {
+      console.warn('Failed to get Gemini API key from settings:', error);
+      return undefined;
+    }
+  }
+
+  async getAvailableProviders(): Promise<AIProvider[]> {
+    const geminiKey = await this.getGeminiKey();
+
     return [
       {
         name: 'Gemini',
-        apiKey: this.geminiKey || '',
-        available: Boolean(this.geminiKey),
+        apiKey: geminiKey ? '***' : '', // Don't expose actual key
+        available: Boolean(geminiKey),
       },
       // Always expose Local fallback so UI can indicate offline capability
       {
@@ -53,9 +71,10 @@ export class AIService {
     const prompt = this.buildPrompt(options);
 
     // Try Gemini first if available
-    if (this.geminiKey) {
+    const geminiKey = await this.getGeminiKey();
+    if (geminiKey) {
       try {
-        return await this.callGemini(prompt, options);
+        return await this.callGemini(prompt, options, geminiKey);
       } catch (error) {
         console.error('Gemini API failed:', error);
       }
@@ -133,11 +152,17 @@ ${jsonSchemaInstruction}
     return brandContext + productContext + instructions;
   }
 
-  private async callGemini(prompt: string, options: CopyGenerationOptions): Promise<GeneratedCopy> {
-    if (!this.geminiKey) return this.generateLocalCopy(options);
+  private async callGemini(
+    prompt: string,
+    options: CopyGenerationOptions,
+    apiKey?: string,
+  ): Promise<GeneratedCopy> {
+    const geminiKey = apiKey || (await this.getGeminiKey());
+
+    if (!geminiKey) return this.generateLocalCopy(options);
 
     const model = 'gemini-1.5-flash';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${this.geminiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
 
     const body = {
       contents: [

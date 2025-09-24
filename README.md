@@ -17,37 +17,40 @@
 - ✅ **Multi-User Support** - Admin panel dengan role-based access (USER/PREMIUM/ADMIN)
 - ✅ **Production Ready** - Docker, security audit compliant, comprehensive documentation
 
-## ⚡ Quick Start
+## 🚀 Quick Start
 
-### Development Setup
+1. **Clone & Install**
 
-```bash
-# 1. Install dependencies
-npm install
+   ```bash
+   git clone <repo-url>
+   cd yuki-yaki-corner
+   npm install
+   ```
 
-# 2. Setup environment
-cp .env.example .env.local
-# Edit .env.local dengan database credentials
+2. **Setup Environment**
 
-# 3. Database setup
-npx prisma generate
-npx prisma db push
-npx prisma db seed
+   ```bash
+   cp .env.template .env.local
+   # Edit .env.local dengan database dan API keys
+   ```
 
-# 4. Start development
-npm run dev
-# Open http://localhost:3000
-```
+3. **Database Setup**
 
-### Production Deployment
+   ```bash
+   npx prisma migrate dev
+   npx prisma db seed  # Creates default admin: admin@localhost / admin123
+   ```
 
-```bash
-# 1. Build application
-npm run build
+4. **Run Development**
 
-# 2. Deploy to Coolify (recommended)
-# See complete guide in docs/DEPLOY-COOLIFY-SIMPLE.md
-```
+   ```bash
+   npm run dev
+   ```
+
+5. **First Login**
+   - Open http://localhost:3000/auth
+   - Login dengan: `admin@localhost` / `admin123`
+   - **PENTING**: Segera ganti email dan password!
 
 ## 🏗️ Architecture
 

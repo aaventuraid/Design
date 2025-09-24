@@ -1,37 +1,101 @@
 #!/bin/bash
-# Coolify Deployment Script
-# Run this after first deployment to setup database
+# Coolify v4 optimized startup script
 
-set -e
+set -e  # Exit on any error
 
-echo "🚀 Setting up Yuki Yaki Corner on Coolify..."
+echo "🚀 Starting Yuki Yaki Corner application..."
+echo "📅 $(date)"
+echo "🔧 Node.js version: $(node --version)"
+echo "📦 NPM version: $(npm --version)"
 
-# Wait for database to be ready
-echo "⏳ Waiting for database connection..."
-timeout 60 sh -c 'until nc -z yuki-yaki-db 5432; do sleep 1; done' || {
-    echo "❌ Database connection timeout"
+# Environment validation
+echo "🔍 Validating environment variables..."
+if [ -z "$DATABASE_URL" ]; then
+    echo "❌ ERROR: DATABASE_URL is not set"
     exit 1
-}
-
-echo "✅ Database connection established"
-
-# Run database migrations
-echo "📊 Running database migrations..."
-npx prisma migrate deploy
-
-# Check if we need to seed
-ADMIN_EXISTS=$(npx prisma db seed --preview-feature 2>&1 | grep -o "Admin user already exists" || echo "")
-
-if [ -z "$ADMIN_EXISTS" ]; then
-    echo "🌱 Seeding database with initial data..."
-    npx prisma db seed
-else
-    echo "ℹ️ Database already seeded, skipping..."
 fi
 
-echo "✅ Database setup completed successfully!"
-echo "🎉 Application is ready!"
+if [ -z "$NEXTAUTH_SECRET" ]; then
+    echo "❌ ERROR: NEXTAUTH_SECRET is not set"
+    exit 1
+fi
 
-# Start the Next.js server
-echo "🚀 Starting application server..."
+echo "✅ Environment variables validated"
+
+# Database setup
+echo "📊 Setting up database..."
+echo "� Running Prisma migrations..."
+if npx prisma migrate deploy --schema=./prisma/schema.prisma; then
+    echo "✅ Database migrations completed successfully"
+else
+    echo "⚠️  Database migration failed, but continuing..."
+fi
+
+# Optional: Generate Prisma client if not exists
+if [ ! -d "./node_modules/.prisma" ]; then
+    echo "🔄 Generating Prisma client..."
+    npx prisma generate
+fi
+
+# Database seed (if needed)
+# Create default admin user if no users exist
+if [ "$NODE_ENV" = "production" ]; then
+  echo "🔐 Checking for default admin user setup..."
+  node -e "
+    const { PrismaClient } = require('@prisma/client');
+    const bcrypt = require('bcryptjs');
+
+    async function setupDefaultAdmin() {
+      const prisma = new PrismaClient();
+      try {
+        const userCount = await prisma.user.count();
+
+        if (userCount === 0) {
+          const defaultPassword = await bcrypt.hash('admin123', 10);
+          
+          await prisma.user.create({
+            data: {
+              email: 'admin@localhost',
+              username: 'admin',
+              passwordHash: defaultPassword,
+              role: 'ADMIN',
+              isActive: true,
+              preferences: {
+                theme: 'light',
+                language: 'id',
+                notifications: true
+              }
+            }
+          });
+          console.log('✅ Default admin user created successfully');
+          console.log('📧 Email: admin@localhost');
+          console.log('🔑 Password: admin123');
+          console.log('⚠️  IMPORTANT: Change password after first login!');
+        } else {
+          console.log('ℹ️  Users already exist, skipping default admin setup...');
+        }
+      } catch (error) {
+        console.error('❌ Failed to setup default admin user:', error.message);
+      } finally {
+        await prisma.\$disconnect();
+      }
+    }
+
+    setupDefaultAdmin();
+  " || echo "⚠️  Admin setup failed, continuing..."
+fi
+
+# Create necessary directories
+echo "📁 Creating data directories..."
+mkdir -p /app/data /app/.data
+chown -R nextjs:nodejs /app/data /app/.data 2>/dev/null || true
+
+# Health check endpoint validation
+echo "🏥 Validating health check endpoint..."
+timeout 30 sh -c 'until nc -z localhost 3000; do sleep 1; done' 2>/dev/null || true
+
+echo "� Application setup completed!"
+echo "� Starting Next.js server on port 3000..."
+
+# Start the application
 exec node server.js

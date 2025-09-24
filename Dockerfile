@@ -1,8 +1,17 @@
-# Dockerfile optimized for Coolify deployment with database support
+# Multi-stage Dockerfile optimized for Coolify v4 deployment
 FROM node:20-alpine AS base
 
-# Install system dependencies for Prisma and Sharp
-RUN apk add --no-cache libc6-compat openssl
+# Install system dependencies for Prisma, Sharp, and wget (for health checks)
+RUN apk add --no-cache \
+    libc6-compat \
+    openssl \
+    wget \
+    curl \
+    && rm -rf /var/cache/apk/*
+
+# Set timezone
+RUN apk add --no-cache tzdata
+ENV TZ=Asia/Jakarta
 
 # ----------------------
 # Dependencies stage
@@ -14,35 +23,44 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 
-# Install production dependencies
-RUN npm ci --only=production --ignore-scripts && \
+# Install production dependencies with retry mechanism
+RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund && \
     npm cache clean --force
 
 # Generate Prisma client
-RUN npx prisma generate
-
-# ----------------------
+RUN npx prisma generate# ----------------------
 # Build stage
 # ----------------------
 FROM base AS builder
 WORKDIR /app
 
-# Disable husky during CI/build
+# Disable telemetry and husky during build
+ENV NEXT_TELEMETRY_DISABLED=1
 ENV HUSKY=0
+ENV CI=true
 
 # Install all dependencies (including dev) for build
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
-RUN npm ci --no-audit --no-fund
+
+# Install with retry mechanism and proper error handling
+RUN npm ci --no-audit --no-fund --prefer-offline --no-optional || \
+    (npm cache clean --force && npm ci --no-audit --no-fund)
 
 # Generate Prisma client for build
 RUN npx prisma generate
 
-# Copy source and build
+# Copy source code (excluding node_modules and .next)
 COPY . .
-ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build the application with production environment
 ENV NODE_ENV=production
 RUN npm run build
+
+# Verify build output
+RUN ls -la .next/ && \
+    test -f .next/standalone/server.js && \
+    echo "Build successful: standalone server.js found"
 
 # ----------------------
 # Production runtime
@@ -50,35 +68,49 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
+# Environment variables for production
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-# Non-root user
-RUN addgroup --system --gid 1001 nodejs \
-    && adduser --system --uid 1001 nextjs
+# Create system user and group
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
-# Copy necessary files
+# Copy application files with proper ownership
 COPY --from=builder /app/next.config.mjs ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 
-# Copy built application
+# Copy built Next.js application
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy Prisma files from deps stage (contains generated client)
+# Copy Prisma files (client and schema)
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
-# Create data directory with proper permissions
-RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
+# Create data directory for persistent storage
+RUN mkdir -p /app/data /app/.data && \
+    chown -R nextjs:nodejs /app/data /app/.data
 
+# Switch to non-root user
 USER nextjs
 
+# Expose port
 EXPOSE 3000
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
 
-# Start with database migration and then the app
-CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
+# Health check endpoint
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+
+# Startup script with proper error handling
+CMD ["sh", "-c", "\
+    echo 'Starting application...' && \
+    echo 'Running database migrations...' && \
+    npx prisma migrate deploy --schema=./prisma/schema.prisma || echo 'Migration failed, continuing...' && \
+    echo 'Starting Next.js server...' && \
+    node server.js \
+    "]

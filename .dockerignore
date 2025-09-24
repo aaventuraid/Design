@@ -1,14 +1,94 @@
 # Reduce build context and avoid copying dev artifacts
+# Git and version control
 .git
+.gitignore
+.github
+
+# Build outputs (will be generated in container)
 .next
 .next-dev
+out
+dist
+build
+
+# Dependencies (will be installed in container) 
 node_modules
-npm-debug.log
-Dockerfile
-.dockerignore
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment and config files
 .env
 .env.*
+!.env.example
+.vercel
+.eslintcache
+
+# Development files
 *.tsbuildinfo
+tsconfig.tsbuildinfo
 coverage
+.nyc_output
+
+# IDE and editor files
 .vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker files (avoid recursion)
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+
+# Documentation and non-essential files
+README.md
+docs/
+*.md
+!docs/DATABASE-FIRST-ARCHITECTURE.md
+LICENSE
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Test files
+test/
+tests/
+__tests__/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Temporary files
+.tmp
+temp/
+tmp/
+
+# Development database (production uses external DB)
+*.db
+*.sqlite
+dev.db
+prisma/dev.db
+
+# Cache directories
+.cache
+.parcel-cache

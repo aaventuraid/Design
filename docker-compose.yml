@@ -1,76 +1,66 @@
-# Docker Compose untuk Testing Database Setup
-# Simulasi environment Coolify secara lokal
-
-version: '3.8'
+# Docker Compose optimized for Coolify v4 deployment
+# This configuration works with Coolify's service orchestration
 
 services:
-  # PostgreSQL Database (simulasi Coolify service)
-  database:
-    image: postgres:15-alpine
-    container_name: yuki-yaki-db
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-yuki_admin}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB:-yuki_yaki_production}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
-    healthcheck:
-      test: [ 'CMD-SHELL', 'pg_isready -U yuki_admin -d yuki_yaki_production' ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Main Application
+  # Main Application - Optimized for Coolify v4
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: yuki-yaki-app
     environment:
+      # Database connection
       - DATABASE_URL=${DATABASE_URL}
-      - JWT_SECRET=${JWT_SECRET}
-      - ADMIN_EMAIL=${ADMIN_EMAIL}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - IMAGE_BG_PROVIDER=${IMAGE_BG_PROVIDER:-internal}
+
+      # Authentication & Security
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${COOLIFY_URL:-http://localhost:3000}
+
+      # Application Settings
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+
+      # Coolify specific
+      - COOLIFY_URL=${COOLIFY_URL}
+      - COOLIFY_FQDN=${COOLIFY_FQDN}
+      - COOLIFY_BRANCH=${COOLIFY_BRANCH:-main}
+
+      # File storage
       - DATA_DIR=/app/data
+      - IMAGE_BG_PROVIDER=${IMAGE_BG_PROVIDER:-internal}
+
     ports:
-      - '3000:3000'
-    depends_on:
-      database:
-        condition: service_healthy
+      - "3000:3000"
+
     volumes:
+      # Persistent data storage
       - app_data:/app/data
+
     restart: unless-stopped
 
-  # Optional: Prisma Studio untuk database management
-  prisma-studio:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: builder
-    container_name: yuki-yaki-studio
-    environment:
-      - DATABASE_URL=${DATABASE_URL}
-    command: npx prisma studio
-    ports:
-      - '5555:5555'
-    depends_on:
-      database:
-        condition: service_healthy
-    profiles:
-      - studio
+    # Health check for Coolify monitoring
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Resource limits (adjust based on your server capacity)
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
 
 volumes:
-  postgres_data:
-    driver: local
   app_data:
     driver: local
 
+# Use Coolify's default network
 networks:
   default:
-    name: yuki-yaki-network
+    external: true
+    name: coolify

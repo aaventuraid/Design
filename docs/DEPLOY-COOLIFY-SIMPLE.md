@@ -1,35 +1,342 @@
-# 🚀 Deploy ke Coolify: Panduan Praktis untuk Pemula
+# 🚀 Deploy ke Coolify v4: Panduan Lengkap & Troubleshooting
 
-**Panduan sederhana deploy aplikasi Next.js ke Coolify self-hosted dalam langkah mudah.**
+**Panduan deploy Next.js + Prisma ke Coolify v4 dengan optimasi khusus untuk environment production.**
 
 ---
 
-## ⚡ Langkah Cepat (TL;DR)
+## ⚡ Quick Fix untuk Error Deployment
 
-1. **Push kode ke GitHub** → 2. **Buat aplikasi di Coolify** → 3. **Set environment variables** → 4. **Deploy!**
+### 🔧 **Perbaikan yang Sudah Diterapkan:**
+
+1. ✅ **Docker optimization** - Multi-stage build dengan Alpine Linux
+2. ✅ **Health check endpoint** - `/api/health` dengan database validation
+3. ✅ **Standalone mode** - Next.js output dioptimasi untuk production
+4. ✅ **Prisma optimization** - Client generation dan migration handling
+5. ✅ **Environment validation** - Automatic validation untuk environment variables
+6. ✅ **Error handling** - Graceful failure dengan proper logging
 
 ---
 
 ## 🎯 Yang Anda Butuhkan
 
-- ✅ Server dengan Coolify sudah terinstall
+- ✅ Server dengan Coolify v4 sudah terinstall
 - ✅ Repository GitHub (public atau private)
+- ✅ PostgreSQL database service di Coolify
 - ✅ Domain yang sudah pointing ke server Coolify
 - ✅ API key Gemini dari Google AI Studio
 
 ---
 
-## 📋 Langkah 1: Persiapan Kode
+## 📋 **Langkah 1: Setup Database di Coolify**
 
-### 1.1 Pastikan File Penting Ada
+### 1.1 Buat PostgreSQL Service
 
-Cek apakah file ini sudah ada di repository:
+1. **Login ke Coolify Dashboard**
+2. **Create New Service** → **Database** → **PostgreSQL**
+3. **Configuration:**
+   ```
+   Service Name: design-db
+   PostgreSQL Version: 15
+   Database Name: designDB
+   Username: designDB
+   Password: [Generate Strong Password]
+   ```
+4. **Deploy database** dan tunggu hingga status **Running**
+5. **Copy Database URL** dari service detail
 
+### 1.2 Verifikasi Database Connection
+
+Test connection via Coolify terminal:
+
+```bash
+psql $DATABASE_URL -c "SELECT version();"
 ```
-✅ Dockerfile (sudah ada)
-✅ package.json (sudah ada)
+
+---
+
+## 📋 **Langkah 2: Deploy Aplikasi**
+
+### 2.1 Create Application di Coolify
+
+1. **New Application** → **Docker Compose**
+2. **Repository Settings:**
+   ```
+   Repository: https://github.com/aaventuraid/Design
+   Branch: main
+   Build Pack: Docker Compose
+   ```
+
+### 2.2 Environment Variables (CRITICAL)
+
+Set environment variables berikut di Coolify:
+
+```bash
+# Database (Required)
+DATABASE_URL=postgres://designDB:YOUR_PASSWORD@SERVICE_NAME:5432/designDB
+
+# Authentication & Security (Required)
+NEXTAUTH_SECRET=your-super-secret-jwt-key-minimum-32-characters
+NEXTAUTH_URL=https://your-domain.com
+
+# Optional Settings
+IMAGE_BG_PROVIDER=internal
+```
+
+### 📝 **AI Configuration**
+
+❌ **TIDAK PERLU** `GEMINI_API_KEY` di environment variables!
+
+✅ **Set melalui Admin Panel** setelah deployment:
+
+1. Login ke aplikasi dengan `admin@localhost` / `admin123`
+2. Masuk ke **Admin Panel**
+3. Set **Gemini API Key** di bagian **AI Configuration**
+4. Save dan test AI features
+
+### 2.3 Domain Configuration
+
+1. **Set Domain** di application settings
+2. **SSL Certificate** - Enable automatic SSL
+3. **Redirect** - Enable HTTPS redirect
+
+---
+
+## 🐛 **Troubleshooting Guide**
+
+### Issue 1: Build Failed - Dependencies
+
+**Symptom:** npm install fails atau timeout  
+**Solution:**
+
+```bash
+# Check di Coolify logs, jika ada timeout, rebuild dengan:
+# Clear cache dan rebuild
+```
+
+### Issue 2: Database Connection Error
+
+**Symptom:** `Cannot connect to database`
+**Diagnosis:**
+
+```bash
+# Test via health endpoint
+curl https://your-domain.com/api/health
+
+# Check response: database.status should be "connected"
+```
+
+**Solution:**
+
+1. Verify `DATABASE_URL` format exactly matches:
+   ```
+   postgres://username:password@service_name:5432/database_name
+   ```
+2. Ensure database service is running
+3. Check network connectivity between services
+
+### Issue 3: Application Starts but 500 Errors
+
+**Symptom:** Container runs but API returns errors
+**Diagnosis:**
+
+```bash
+# Use debug script
+docker exec CONTAINER_ID /app/scripts/debug-coolify.sh
+```
+
+**Common causes:**
+
+- Missing `NEXTAUTH_SECRET`
+- Invalid `GEMINI_API_KEY`
+- Prisma client not generated
+- File permission issues
+
+### Issue 4: Health Check Fails
+
+**Symptom:** Container restarts frequently
+**Solution:**
+
+1. Check health endpoint manually:
+   ```bash
+   wget -O- http://localhost:3000/api/health
+   ```
+2. Verify response contains `"ok": true`
+3. Check database connectivity within container
+
+### Issue 5: Static Files Not Loading
+
+**Symptom:** Pages load but no CSS/JS
+**Solution:**
+
+1. Verify `output: 'standalone'` in `next.config.mjs`
+2. Check static files copied correctly:
+   ```bash
+   ls -la .next/static/
+   ```
+
+---
+
+## 🔍 **Debug Commands untuk Coolify**
+
+### Check Application Status
+
+```bash
+# Health check
+curl https://your-domain.com/api/health | jq
+
+# Detailed debug info (dalam container)
+./scripts/debug-coolify.sh
+
+# Database connection test
+node -e "
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+prisma.\$connect().then(() => console.log('DB OK')).catch(console.error);
+"
+```
+
+### Check Logs
+
+```bash
+# Application logs di Coolify dashboard
+# Atau via terminal:
+docker logs CONTAINER_ID --tail=100
+```
+
+### Performance Check
+
+```bash
+# Memory usage
+free -m
+
+# Disk space
+df -h
+
+# Process check
+ps aux | grep node
+```
+
+---
+
+## ✅ **Verification Checklist**
+
+Setelah deployment, verify:
+
+- [ ] **Database connected** - Health endpoint shows `database.status: "connected"`
+- [ ] **Admin login works** - Can login dengan INITIAL_ADMIN_EMAIL
+- [ ] **Copy generation works** - Test generate copy dengan Gemini
+- [ ] **File upload works** - Test image upload functionality
+- [ ] **SSL certificate** - HTTPS working correctly
+- [ ] **Performance** - Response time < 3s untuk health check
+
+---
+
+## 🎯 **Post-Deployment Setup**
+
+### 1. Admin Configuration
+
+1. Login dengan `INITIAL_ADMIN_EMAIL`
+2. Go to `/admin` page
+3. Configure Gemini API key jika belum di environment
+4. Test copy generation functionality
+
+### 2. Monitoring Setup
+
+- **Health monitoring** - Monitor `/api/health` endpoint
+- **Error tracking** - Check Coolify logs regularly
+- **Performance** - Monitor response times
+- **Database** - Monitor database performance
+
+### 3. Backup Strategy
+
+```bash
+# Database backup (setup cron job)
+pg_dump $DATABASE_URL > backup_$(date +%Y%m%d).sql
+
+# File backup (data directory)
+tar -czf data_backup_$(date +%Y%m%d).tar.gz /app/data
+```
+
+---
+
+## � **Performance Optimization**
+
+### 1. Application Level
+
+- **Caching** - Implement Redis untuk session storage
+- **CDN** - Use Cloudinary atau similar untuk images
+- **Compression** - Enable gzip compression
+
+### 2. Database Level
+
+- **Connection pooling** - Configure Prisma connection pool
+- **Indexing** - Add database indexes untuk frequent queries
+- **Monitoring** - Setup database performance monitoring
+
+### 3. Infrastructure Level
+
+- **Resource limits** - Set appropriate CPU/memory limits
+- **Health checks** - Fine-tune health check intervals
+- **Load balancing** - Setup multiple instances jika perlu
+
+---
+
+## 📞 **Support & Debugging**
+
+### Error Reporting
+
+Jika masih ada issues setelah mengikuti guide ini:
+
+1. **Jalankan debug script:**
+
+   ```bash
+   ./scripts/debug-coolify.sh > debug_output.txt
+   ```
+
+2. **Check health endpoint:**
+
+   ```bash
+   curl https://your-domain.com/api/health | jq > health_check.json
+   ```
+
+3. **Collect logs:**
+   - Coolify deployment logs
+   - Application runtime logs
+   - Database connection logs
+
+### Ready untuk Production! 🎉
+
+Dengan setup ini, aplikasi seharusnya berjalan stabil di Coolify v4 dengan:
+
+- ✅ Automatic health monitoring
+- ✅ Database connection resilience
+- ✅ Proper error handling
+- ✅ Performance optimization
+- ✅ Security best practices
+
+---
+
+## 🔄 **Update & Maintenance**
+
+### Rolling Updates
+
+```bash
+# Deploy update (via Coolify UI atau webhook)
+# Health check akan memverifikasi deployment berhasil
+# Rollback otomatis jika health check fail
+```
+
+### Database Migrations
+
+```bash
+# Migrations run automatically saat container start
+# Monitor logs untuk memastikan migration berhasil
+```
+
+Aplikasi sekarang siap untuk production workload! 🚀
 ✅ prisma/schema.prisma (sudah ada)
-```
+
+````
 
 ### 1.2 Push ke GitHub
 
@@ -38,7 +345,7 @@ Cek apakah file ini sudah ada di repository:
 git add .
 git commit -m "ready for production deploy"
 git push origin main
-```
+````
 
 **Selesai!** Kode sudah siap.
 
@@ -129,31 +436,27 @@ postgresql://yuki_admin:password@yuki-yaki-db:5432/yuki_yaki_prod
 ```
 DATABASE_URL=postgresql://yuki_admin:password@yuki-yaki-db:5432/yuki_yaki_prod
 NEXTAUTH_SECRET=K8mJ9vN2pQ4rS7wX1aB6cE9fH3kL8mP5qR7tU0vY2zA4bC6dF9gH1jK3mN6pQ8sT
-NEXTAUTH_URL=https://domain-anda.com
+NEXTAUTH_URL=https://design.yukiyaki.id
 NODE_ENV=production
 ```
 
-**Variables opsional:**
+**Variables opsional untuk AI:**
 
 ```
-INITIAL_ADMIN_EMAIL=admin@domain-anda.com
-INITIAL_ADMIN_PASSWORD=AdminPassword123!
-```
-
-```
-DATABASE_URL=postgresql://yuki_admin:password@yuki-yaki-db:5432/yuki_yaki_prod
 GEMINI_API_KEY=your_gemini_api_key_here
-NEXTAUTH_SECRET=random_string_minimal_32_karakter
-NEXTAUTH_URL=https://domain-anda.com
-NODE_ENV=production
+IMAGE_BG_PROVIDER=internal
 ```
 
-**Variables opsional:**
+### 📝 **ADMIN USER SETUP (Otomatis)**
 
-```
-INITIAL_ADMIN_EMAIL=admin@domain-anda.com
-INITIAL_ADMIN_PASSWORD=AdminPassword123!
-```
+❌ **TIDAK PERLU** environment variables untuk admin setup!
+
+✅ **Admin default** akan dibuat otomatis saat deployment pertama:
+
+- 📧 **Email**: `admin@localhost`
+- 🔑 **Password**: `admin123`
+
+⚠️ **PENTING**: Segera login dan ganti email + password setelah deployment!
 
 ### 4.2 Generate NEXTAUTH_SECRET
 
