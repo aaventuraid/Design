@@ -1,21 +1,22 @@
-# Documentation Index
+# 📖 Dokumentasi Yuki Yaki Corner
 
-Welcome to the Yuki Yaki Corner documentation! This folder contains comprehensive documentation for the project.
+Selamat datang di dokumentasi lengkap aplikasi image processing dan copy generator!
 
-## 📚 Documentation Overview
+## � Deployment
 
-### Project Information
+### Production Deployment
 
-- **[Project Details](#project-details)** - Complete project description and features
-- **[ROADMAP.md](./ROADMAP.md)** - Development roadmap and future plans
-- **[DESIGN-ROADMAP.md](./DESIGN-ROADMAP.md)** - Design system and UX roadmap
+- **[DEPLOY-COOLIFY-SIMPLE.md](./DEPLOY-COOLIFY-SIMPLE.md)** - 🎯 **PANDUAN UTAMA** Deploy ke Coolify (Self-hosted)
 
-### Deployment & Setup Guides
+### Development & Updates
 
-- **[DEPLOY-GUIDE-EN.md](./DEPLOY-GUIDE-EN.md)** - English deployment guide for Netlify
-- **[PANDUAN-DEPLOY-NETLIFY.md](./PANDUAN-DEPLOY-NETLIFY.md)** - Panduan deploy ke Netlify (Indonesian)
-- **[PANDUAN-COOLIFY-FIX.md](./PANDUAN-COOLIFY-FIX.md)** - Panduan troubleshooting Coolify
-- **[PANDUAN-UPDATE-EFISIEN.md](./PANDUAN-UPDATE-EFISIEN.md)** - Panduan update yang efisien
+- **[PANDUAN-UPDATE-EFISIEN.md](./PANDUAN-UPDATE-EFISIEN.md)** - Update aplikasi dengan efisien
+- **[DATABASE-SCALE-UP.md](./DATABASE-SCALE-UP.md)** - Scale up database untuk production
+
+## 🗺 Planning & Roadmap
+
+- **[ROADMAP.md](./ROADMAP.md)** - Development roadmap dan future plans
+- **[DESIGN-ROADMAP.md](./DESIGN-ROADMAP.md)** - Design system dan UX roadmap
 
 ---
 
@@ -50,19 +51,17 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### 📦 Deployment
+### 📦 Production Deployment
 
-See deployment guides in this docs folder:
+**Recommended:** Gunakan Coolify self-hosted untuk production yang optimal.
 
-- **[DEPLOY-GUIDE-EN.md](./DEPLOY-GUIDE-EN.md)** - English deployment guide for Netlify
-- **[PANDUAN-DEPLOY-NETLIFY.md](./PANDUAN-DEPLOY-NETLIFY.md)** - Panduan deploy ke Netlify (Indonesian)
-- **[PANDUAN-COOLIFY-FIX.md](./PANDUAN-COOLIFY-FIX.md)** - Troubleshooting guide for Coolify
+📖 **[DEPLOY-COOLIFY-SIMPLE.md](./DEPLOY-COOLIFY-SIMPLE.md)** - Panduan lengkap deploy production
 
-#### Other Platforms
+#### Alternative Platforms
 
 - **Vercel**: `npm i -g vercel && vercel`
 - **Railway**: Connect GitHub repository
-- **Heroku**: Add buildpack dan Procfile
+- **Docker**: `docker build -t app . && docker run -p 3000:3000 app`
 
 ### 🗺️ Roadmap & Future Development
 
