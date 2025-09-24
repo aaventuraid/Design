@@ -4,7 +4,7 @@
 
 ## 📋 **Complete Documentation**
 
-🎯 **[PROJECT-GUIDE.md](./PROJECT-GUIDE.md)** - **PANDUAN LENGKAP** project overview, architecture, roadmap, dan development guide
+🎯 **[docs/PROJECT-GUIDE.md](./docs/PROJECT-GUIDE.md)** - **PANDUAN LENGKAP** project overview, architecture, roadmap, dan development guide
 
 🚀 **[docs/DEPLOY-COOLIFY-SIMPLE.md](./docs/DEPLOY-COOLIFY-SIMPLE.md)** - **DEPLOYMENT GUIDE** untuk production
 
