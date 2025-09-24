@@ -1,11 +1,45 @@
 import { NextRequest } from 'next/server';
 import { getSettings } from '@/lib/settings';
 import { AIService } from '@/lib/ai-service';
+import { getClientIP, getUserAgent } from '@/lib/middleware';
+import { DatabaseService } from '@/lib/database';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
+    // Database-based rate limiting dan auth
+    let user = null;
+    const authHeader = req.headers.get('authorization');
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (token) {
+      user = await DatabaseService.validateSession(token);
+    }
+
+    const rateLimit = await DatabaseService.checkRateLimit(user?.id || null, 'COPY_GENERATE');
+
+    if (!rateLimit.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded. Coba lagi sebentar.',
+          resetTime: rateLimit.resetTime,
+          remaining: rateLimit.remaining,
+        }),
+        {
+          status: 429,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+    }
+
+    // Track usage
+    await DatabaseService.trackUsage({
+      userId: user?.id,
+      action: 'COPY_GENERATE',
+      ipAddress: getClientIP(req),
+    });
+
     const options = await req.json().catch(() => ({}));
 
     if (!options.productName) {
@@ -14,7 +48,8 @@ export async function POST(req: NextRequest) {
 
     const settings = await getSettings();
     // If admin sets default provider to local, force local by not passing the Gemini key
-    const effectiveGeminiKey = settings.defaultAIProvider === 'local' ? undefined : settings.geminiApiKey;
+    const effectiveGeminiKey =
+      settings.defaultAIProvider === 'local' ? undefined : settings.geminiApiKey;
     const aiService = new AIService(effectiveGeminiKey, undefined);
 
     const copy = await aiService.generateCopy({
@@ -33,6 +68,10 @@ export async function POST(req: NextRequest) {
       ...copy,
       providers: aiService.getAvailableProviders(),
       timestamp: new Date().toISOString(),
+      rateLimit: {
+        remaining: rateLimit.remaining,
+        resetTime: rateLimit.resetTime,
+      },
     });
   } catch (error: any) {
     console.error('Copy generation error:', error);

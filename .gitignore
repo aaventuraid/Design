@@ -47,3 +47,5 @@ desktop.ini
 
 # App Data (Local settings, secrets cache)
 .data/
+
+/generated/prisma

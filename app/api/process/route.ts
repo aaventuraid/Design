@@ -2,32 +2,68 @@ import { NextRequest } from 'next/server';
 import sharp from 'sharp';
 import { getPresetConfig, type MarketplacePreset } from '@/lib/marketplace';
 import { Brand } from '@/lib/branding';
+import { getClientIP, getUserAgent } from '@/lib/middleware';
+import { DatabaseService } from '@/lib/database';
 
 export const runtime = 'nodejs';
 
-// Simple per-IP rate limiter (memory). Suitable for single-instance setups.
-const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
-const RATE_LIMIT_MAX = 30; // 30 requests/min/IP for image processing
-const ipHits = new Map<string, { count: number; resetAt: number }>();
-
-function rateLimit(ip: string | null | undefined): boolean {
-  if (!ip) return false;
-  const now = Date.now();
-  const cur = ipHits.get(ip);
-  if (!cur || now > cur.resetAt) {
-    ipHits.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return false;
-  }
-  cur.count += 1;
-  if (cur.count > RATE_LIMIT_MAX) return true;
-  return false;
-}
-
 export async function POST(req: NextRequest) {
+  const startTime = Date.now();
+
   try {
-    // Rate limit
+    // Database-based rate limiting dan auth
+    let user = null;
+    const authHeader = req.headers.get('authorization');
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (token) {
+      user = await DatabaseService.validateSession(token);
+    }
+
+    const rateLimit = await DatabaseService.checkRateLimit(user?.id || null, 'IMAGE_PROCESS');
+
+    if (!rateLimit.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded. Coba lagi sebentar.',
+          resetTime: rateLimit.resetTime,
+          remaining: rateLimit.remaining,
+        }),
+        {
+          status: 429,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+    }
+
+    // Track usage
+    await DatabaseService.trackUsage({
+      userId: user?.id,
+      action: 'IMAGE_PROCESS',
+      ipAddress: getClientIP(req),
+    });
+
+    // Continue with existing rate limit check for IP (fallback)
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || (req as any).ip;
-    if (rateLimit(ip)) {
+    // Simple per-IP rate limiter as backup
+    const RATE_LIMIT_WINDOW_MS = 60_000;
+    const RATE_LIMIT_MAX = 30;
+    const ipHits = new Map<string, { count: number; resetAt: number }>();
+
+    function simpleRateLimit(checkIp: string | null | undefined): boolean {
+      if (!checkIp) return false;
+      const now = Date.now();
+      const cur = ipHits.get(checkIp);
+      if (!cur || now > cur.resetAt) {
+        ipHits.set(checkIp, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+        return false;
+      }
+      cur.count += 1;
+      if (cur.count > RATE_LIMIT_MAX) return true;
+      return false;
+    }
+
+    if (simpleRateLimit(ip)) {
       return new Response('Rate limit exceeded. Coba lagi sebentar.', { status: 429 });
     }
     const formData = await req.formData();
@@ -184,12 +220,32 @@ export async function POST(req: NextRequest) {
       }
       const body = new Uint8Array(buffer);
 
+      // Track successful image processing
+      const processingTimeMs = Date.now() - startTime;
+      await DatabaseService.trackImageProcessing({
+        userId: user?.id,
+        originalName: file.name,
+        fileSize: arrayBuffer.byteLength,
+        dimensions: {
+          width: presetConfig.dimensions.width,
+          height: presetConfig.dimensions.height,
+        },
+        preset,
+        outputFormat: presetConfig.format,
+        outputSize: buffer.byteLength,
+        processingTimeMs,
+        userAgent: getUserAgent(req),
+        ipAddress: getClientIP(req),
+      });
+
       // Set response headers with marketplace info
       const headers = new Headers({
         'Content-Type': contentType,
         'X-Marketplace': preset,
         'X-Dimensions': `${presetConfig.dimensions.width}x${presetConfig.dimensions.height}`,
         'X-Optimized-For': presetConfig.name,
+        'X-Rate-Limit-Remaining': rateLimit.remaining.toString(),
+        'X-Rate-Limit-Reset': rateLimit.resetTime.toISOString(),
       });
 
       return new Response(body, { headers });
