@@ -3,6 +3,9 @@ import jwt from 'jsonwebtoken';
 import { DatabaseService } from '@/lib/database';
 
 export async function middleware(request: NextRequest) {
+  // Temporary disable middleware for debugging redirect loop
+  console.log(`[MIDDLEWARE] ${request.method} ${request.nextUrl.pathname}`);
+  
   // Apply to admin routes only
   if (!request.nextUrl.pathname.startsWith('/admin')) {
     return NextResponse.next();
@@ -13,7 +16,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Handle reverse proxy headers properly
+  // TEMPORARY: Skip all admin auth checks to test redirect loop
+  console.log(`[MIDDLEWARE] Skipping auth check for debugging: ${request.nextUrl.pathname}`);
+  return NextResponse.next();
+
+  // Handle reverse proxy headers properly (disabled for now)
   const protocol = request.headers.get('x-forwarded-proto') || 'http';
   const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || 'localhost:3000';
   const baseUrl = `${protocol}://${host}`;
@@ -56,5 +63,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  // Temporary disable matcher for debugging
+  matcher: [],
 };
