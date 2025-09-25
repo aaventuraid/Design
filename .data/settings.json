@@ -1,0 +1,14 @@
+{
+  "defaultAIProvider": "local",
+  "imageBgProvider": "internal",
+  "defaultTolerance": 12,
+  "maxFileSize": 8,
+  "defaultMarketplace": "gofood",
+  "brandingEnabled": false,
+  "watermarkEnabled": false,
+  "theme": "light",
+  "language": "id",
+  "analyticsEnabled": true,
+  "processingHistory": true,
+  "rateLimit": 100
+}
