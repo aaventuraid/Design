@@ -31,6 +31,9 @@ COPY prisma ./prisma/
 RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund && \
     npm cache clean --force
 
+# Install Sharp for Alpine Linux musl compatibility (production deps)
+RUN npm install --platform=linux --arch=x64 --libc=musl sharp
+
 # Generate Prisma client
 RUN npx prisma generate
 # ----------------------
@@ -51,6 +54,9 @@ COPY prisma ./prisma/
 # Install with retry mechanism and proper error handling
 RUN npm ci --no-audit --no-fund --prefer-offline --no-optional || \
     (npm cache clean --force && npm ci --no-audit --no-fund)
+
+# Install Sharp for Alpine Linux musl compatibility
+RUN npm install --platform=linux --arch=x64 --libc=musl sharp
 
 # Generate Prisma client for build
 RUN npx prisma generate

@@ -1,9 +1,19 @@
 import { NextRequest } from 'next/server';
-import sharp from 'sharp';
 import { getPresetConfig, type MarketplacePreset } from '@/lib/marketplace';
 import { Brand } from '@/lib/branding';
 import { getClientIP, getUserAgent } from '@/lib/middleware';
 import { DatabaseService } from '@/lib/database';
+
+// Dynamic import for Sharp to handle Alpine Linux compatibility
+const loadSharp = async () => {
+  try {
+    const sharp = await import('sharp');
+    return sharp.default;
+  } catch (error) {
+    console.error('Sharp loading error:', error);
+    throw new Error('Image processing unavailable - Sharp module not loaded');
+  }
+};
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -12,6 +22,9 @@ export async function POST(req: NextRequest) {
   const startTime = Date.now();
 
   try {
+    // Load Sharp dynamically
+    const sharp = await loadSharp();
+
     // Database-based rate limiting dan auth
     let user = null;
     const authHeader = req.headers.get('authorization');
@@ -175,7 +188,10 @@ export async function POST(req: NextRequest) {
           preset === 'general'
             ? await out
                 .metadata()
-                .then((m) => ({ width: m.width || info.width, height: m.height || info.height }))
+                .then((m: any) => ({
+                  width: m.width || info.width,
+                  height: m.height || info.height,
+                }))
             : presetConfig.dimensions;
         out = out.composite([
           {
