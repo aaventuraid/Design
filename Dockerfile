@@ -9,6 +9,7 @@ RUN apk add --no-cache \
     openssl \
     wget \
     curl \
+    netcat-openbsd \
     && rm -rf /var/cache/apk/*
 
 # Set timezone
