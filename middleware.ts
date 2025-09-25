@@ -29,18 +29,19 @@ export async function middleware(request: NextRequest) {
     // Get token from cookie
     const token = request.cookies.get('admin-session')?.value;
 
-    if (!token) {
+    if (!token || typeof token !== 'string') {
       return NextResponse.redirect(new URL('/admin/login', baseUrl));
     }
 
-    // Verify JWT
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
+    // Verify JWT with proper type checking
+    const jwtSecret = process.env.JWT_SECRET || 'fallback-secret';
+    const decoded = jwt.verify(token, jwtSecret) as any;
 
     if (decoded.sessionType !== 'admin') {
       return NextResponse.redirect(new URL('/admin/login', baseUrl));
     }
 
-    // Verify session still exists
+    // Verify session still exists (token is guaranteed to be string here)
     const user = await DatabaseService.validateSession(token);
     if (!user || user.role !== 'ADMIN') {
       const response = NextResponse.redirect(new URL('/admin/login', baseUrl));
