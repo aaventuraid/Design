@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const isProd = process.env.NODE_ENV === 'production';
 const nextConfig = {
-  // Disable standalone output for better development experience
-  // ...(isProd ? { output: 'standalone' } : {}),
+  // Enable standalone output for Docker deployment
+  ...(isProd ? { output: 'standalone' } : {}),
 
   // Optimize for Coolify deployment
   trailingSlash: false,
