@@ -4,11 +4,11 @@
 
 ### 🗂️ Files Updated:
 
-1. **COOLIFY-DEPLOYMENT-GUIDE.md** - Main documentation
+1. **DEPLOY-COOLIFY.md** - Main documentation
 2. **.env.example** - Development example
 3. **.env.coolify** - Coolify deployment template
 4. **.env.production.example** - Production template
-5. **DEPLOY-COOLIFY-SIMPLE.md** - Simple deployment guide
+5. **DEPLOY-COOLIFY.md** - Deployment guide
 6. **DATABASE-SCALE-UP.md** - Scale up documentation
 7. **DATABASE-FIRST-ARCHITECTURE.md** - Architecture guide
 

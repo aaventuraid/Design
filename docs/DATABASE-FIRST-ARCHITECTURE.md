@@ -163,7 +163,7 @@ curl -X GET http://localhost:3000/api/admin/management \
 ## 📚 Related Documentation
 
 - [Security Audit Report](./SECURITY-AUDIT.md)
-- [Deployment Guide](./DEPLOY-COOLIFY-SIMPLE.md)
+- [Deployment Guide](./DEPLOY-COOLIFY.md)
 - [Database Schema](../prisma/schema.prisma)
 
 **Status**: 🟢 Database-First Implementation Complete

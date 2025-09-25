@@ -85,7 +85,7 @@ tmp/
 
 # Development database (production uses external DB)
 *.db
-*.sqlite
+# SQLite files removed - PostgreSQL only
 dev.db
 prisma/dev.db
 

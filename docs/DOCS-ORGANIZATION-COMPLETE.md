@@ -20,7 +20,7 @@
 docs/
 ├── README.md                              # 📋 Documentation navigation index
 ├── PROJECT-GUIDE.md                      # 🎯 Complete project guide (unified)
-├── DEPLOY-COOLIFY-SIMPLE.md              # 🚀 Production deployment guide
+├── DEPLOY-COOLIFY.md                     # 🚀 Production deployment guide
 ├── DATABASE-FIRST-ARCHITECTURE.md       # 🏗️ Architecture explanation
 ├── SECURITY-AUDIT.md                    # 🛡️ Security implementation
 ├── PANDUAN-UPDATE-EFISIEN.md            # 🔧 Maintenance guide
@@ -36,7 +36,7 @@ docs/
 
 ```markdown
 🎯 docs/PROJECT-GUIDE.md # Complete project documentation
-🚀 docs/DEPLOY-COOLIFY-SIMPLE.md # Production deployment
+🚀 docs/DEPLOY-COOLIFY.md # Production deployment
 ```
 
 ### docs/README.md (Navigation Hub)
@@ -45,7 +45,7 @@ docs/
 ## For Developers
 
 - PROJECT-GUIDE.md (complete overview)
-- DEPLOY-COOLIFY-SIMPLE.md (production deployment)
+- DEPLOY-COOLIFY.md (production deployment)
 - DATABASE-FIRST-ARCHITECTURE.md (architecture)
 
 ## For Project Management

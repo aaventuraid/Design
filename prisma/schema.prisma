@@ -1,5 +1,5 @@
-// Skema Database untuk Scale Up
-// Mendukung multi-user, analytics, dan audit trails
+// AI-Powered Content & Social Media Platform Database Schema
+// PostgreSQL-only implementation for food delivery optimization and social media automation
 
 generator client {
   provider = "prisma-client-js"
@@ -16,7 +16,7 @@ model User {
   email        String   @unique
   username     String?  @unique
   passwordHash String
-  role         UserRole @default(USER)
+  role         Role     @default(USER)
   isActive     Boolean  @default(true)
   
   // User preferences
@@ -32,13 +32,16 @@ model User {
   processings    ImageProcessing[]
   usageRecords   UsageRecord[]
   apiKeys        ApiKey[]
+  foodImages     FoodImage[]
+  campaigns      Campaign[]
+  socialAccounts SocialAccount[]
   
   @@map("users")
 }
 
-enum UserRole {
-  ADMIN
+enum Role {
   USER
+  ADMIN
   PREMIUM
 }
 
@@ -109,6 +112,9 @@ enum UsageAction {
   IMAGE_PROCESS
   COPY_GENERATE
   API_CALL
+  FOOD_OPTIMIZE
+  CAMPAIGN_CREATE
+  CONTENT_GENERATE
 }
 
 // Model ApiKey - API Access Management
@@ -174,4 +180,180 @@ model AuditLog {
   createdAt DateTime @default(now())
   
   @@map("audit_logs")
+}
+
+// Model FoodImage - Food Delivery Image Optimization
+model FoodImage {
+  id              String   @id @default(cuid())
+  originalUrl     String
+  optimizedUrls   Json     // Platform-specific optimized versions: {grabfood: "url", shopee: "url", gofood: "url"}
+  foodCategory    String?
+  aiAnalysis      Json?    // AI-generated food analysis
+  optimizationLog Json     // Processing steps applied
+  performanceData Json?    // Usage analytics
+  
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("food_images")
+}
+
+// Model Campaign - Social Media Campaign Management
+model Campaign {
+  id           String            @id @default(cuid())
+  name         String
+  description  String?
+  
+  // Campaign Configuration
+  seedData     Json              // Original input (image/keyword)
+  strategy     Json              // AI-generated strategy
+  duration     Int               // Campaign duration in days
+  objective    CampaignObjective // SALES, ENGAGEMENT, MIXED
+  status       CampaignStatus    // DRAFT, ACTIVE, PAUSED, COMPLETED
+  
+  // Targeting (PostgreSQL native arrays)
+  platforms    Platform[]        // Target social media platforms
+  targetAudience Json?           // Audience configuration
+  
+  // Relations
+  contents     ScheduledContent[]
+  analytics    CampaignAnalytics[]
+  
+  userId       String
+  user         User              @relation(fields: [userId], references: [id])
+  
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  startDate    DateTime?
+  endDate      DateTime?
+  
+  @@map("campaigns")
+}
+
+// Model ScheduledContent - Individual Content Pieces
+model ScheduledContent {
+  id           String        @id @default(cuid())
+  
+  // Content Data
+  title        String
+  caption      String        @db.Text
+  hashtags     String[]      // PostgreSQL native array
+  imageUrl     String?
+  videoUrl     String?
+  contentType  ContentType   // POST, STORY, REEL, VIDEO
+  
+  // Scheduling
+  platform     Platform      // TIKTOK, INSTAGRAM, FACEBOOK
+  day          Int           // Day in campaign (1-30)
+  scheduledAt  DateTime
+  publishedAt  DateTime?
+  
+  // Status & Performance
+  status       ContentStatus // DRAFT, SCHEDULED, PUBLISHED, FAILED
+  analytics    Json?         // Platform-specific analytics
+  aiGenerated  Boolean       @default(true)
+  
+  // Relations
+  campaignId   String
+  campaign     Campaign      @relation(fields: [campaignId], references: [id])
+  
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  
+  @@map("scheduled_contents")
+}
+
+// Model SocialAccount - Connected Social Media Accounts
+model SocialAccount {
+  id           String   @id @default(cuid())
+  platform     Platform
+  platformId   String   // Platform-specific user ID
+  username     String
+  displayName  String?
+  accessToken  String   // Will be encrypted at application level
+  refreshToken String?  // Will be encrypted at application level
+  tokenExpires DateTime?
+  isActive     Boolean  @default(true)
+  
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@unique([userId, platform])
+  @@map("social_accounts")
+}
+
+// Model CampaignAnalytics - Performance Metrics
+model CampaignAnalytics {
+  id           String   @id @default(cuid())
+  
+  // Performance Metrics
+  impressions  Int      @default(0)
+  reach        Int      @default(0)
+  likes        Int      @default(0)
+  comments     Int      @default(0)
+  shares       Int      @default(0)
+  clicks       Int      @default(0)
+  conversions  Int      @default(0)
+  
+  // Financial Metrics
+  revenue      Decimal? @db.Decimal(10,2)
+  costPerClick Decimal? @db.Decimal(10,4)
+  roi          Decimal? @db.Decimal(10,4)
+  
+  // Time & Platform
+  date         DateTime
+  platform     Platform
+  contentId    String?  // Reference to specific content
+  
+  campaignId   String
+  campaign     Campaign @relation(fields: [campaignId], references: [id])
+  
+  createdAt    DateTime @default(now())
+  
+  @@unique([campaignId, platform, date])
+  @@map("campaign_analytics")
+}
+
+// Enums for New Features
+enum Platform {
+  TIKTOK
+  INSTAGRAM
+  FACEBOOK
+}
+
+enum CampaignObjective {
+  SALES
+  ENGAGEMENT
+  BRAND_AWARENESS
+  MIXED
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum ContentType {
+  POST
+  STORY
+  REEL
+  VIDEO
+  CAROUSEL
+}
+
+enum ContentStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  FAILED
+  CANCELLED
 }

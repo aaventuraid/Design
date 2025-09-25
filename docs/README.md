@@ -5,7 +5,7 @@ Selamat datang di dokumentasi lengkap aplikasi AI-powered food content generator
 ## 🎯 **PANDUAN UTAMA**
 
 - **[PROJECT-GUIDE.md](./PROJECT-GUIDE.md)** - 📋 **COMPLETE PROJECT GUIDE** - Overview, roadmap, dan panduan lengkap
-- **[DEPLOY-COOLIFY-SIMPLE.md](./DEPLOY-COOLIFY-SIMPLE.md)** - 🚀 **DEPLOYMENT GUIDE** - Deploy ke production
+- **[DEPLOY-COOLIFY.md](./DEPLOY-COOLIFY.md)** - 🚀 **DEPLOYMENT GUIDE** - Deploy ke Coolify (panduan resmi)
 
 ## 🔧 **TECHNICAL DOCUMENTATION**
 
@@ -25,7 +25,7 @@ Selamat datang di dokumentasi lengkap aplikasi AI-powered food content generator
 ### For Developers
 
 - Start with **[PROJECT-GUIDE.md](./PROJECT-GUIDE.md)** for complete overview
-- Use **[DEPLOY-COOLIFY-SIMPLE.md](./DEPLOY-COOLIFY-SIMPLE.md)** for production deployment
+- Use **[DEPLOY-COOLIFY.md](./DEPLOY-COOLIFY.md)** for production deployment
 - Review **[DATABASE-FIRST-ARCHITECTURE.md](./DATABASE-FIRST-ARCHITECTURE.md)** for architecture understanding
 
 ### For Project Management

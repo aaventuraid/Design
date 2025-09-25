@@ -113,7 +113,7 @@ npm run dev
 
 **Recommended**: Coolify Self-Hosted
 
-📖 **Complete Guide**: [`docs/DEPLOY-COOLIFY-SIMPLE.md`](./docs/DEPLOY-COOLIFY-SIMPLE.md)
+📖 **Complete Guide**: [`DEPLOY-COOLIFY.md`](./DEPLOY-COOLIFY.md)
 
 **Quick Deploy:**
 
@@ -393,7 +393,7 @@ GET  /api/analytics
 
 **Deployment & Operations:**
 
-- [`DEPLOY-COOLIFY-SIMPLE.md`](./docs/DEPLOY-COOLIFY-SIMPLE.md) - Production deployment guide
+- [`DEPLOY-COOLIFY.md`](./DEPLOY-COOLIFY.md) - Production deployment guide
 - [`DATABASE-FIRST-ARCHITECTURE.md`](./docs/DATABASE-FIRST-ARCHITECTURE.md) - Architecture explanation
 - [`SECURITY-AUDIT.md`](./docs/SECURITY-AUDIT.md) - Security implementation details
 - [`PANDUAN-UPDATE-EFISIEN.md`](./docs/PANDUAN-UPDATE-EFISIEN.md) - Maintenance guide

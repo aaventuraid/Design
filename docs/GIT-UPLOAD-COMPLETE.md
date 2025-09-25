@@ -79,7 +79,7 @@ NEXTAUTH_URL=https://yourdomain.com
 
 **✅ Documentation:**
 
-- [x] Deployment guide (`docs/DEPLOY-COOLIFY-SIMPLE.md`)
+- [x] Deployment guide (`docs/DEPLOY-COOLIFY.md`)
 - [x] Database architecture (`docs/DATABASE-FIRST-ARCHITECTURE.md`)
 - [x] Security audit (`docs/SECURITY-AUDIT.md`)
 - [x] Implementation summary (`IMPLEMENTATION-SUMMARY.md`)
@@ -110,4 +110,4 @@ Setelah setup aplikasi di Coolify, gunakan settings ini:
 
 **🎉 Repository Anda siap untuk production deployment!**
 
-Lanjutkan dengan setup di Coolify menggunakan panduan `docs/DEPLOY-COOLIFY-SIMPLE.md`
+Lanjutkan dengan setup di Coolify menggunakan panduan `docs/DEPLOY-COOLIFY.md`

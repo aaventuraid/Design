@@ -99,7 +99,7 @@ README.md (Root)
 ├── PROJECT-GUIDE.md (Complete Guide)
 └── docs/
     ├── README.md (Documentation Index)
-    ├── DEPLOY-COOLIFY-SIMPLE.md (Production Deployment)
+    ├── DEPLOY-COOLIFY.md (Production Deployment)
     ├── DATABASE-FIRST-ARCHITECTURE.md (Architecture Details)
     ├── SECURITY-AUDIT.md (Security Implementation)
     └── PANDUAN-UPDATE-EFISIEN.md (Maintenance Guide)

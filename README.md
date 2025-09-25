@@ -6,7 +6,7 @@
 
 🎯 **[docs/PROJECT-GUIDE.md](./docs/PROJECT-GUIDE.md)** - **PANDUAN LENGKAP** project overview, architecture, roadmap, dan development guide
 
-🚀 **[docs/DEPLOY-COOLIFY-SIMPLE.md](./docs/DEPLOY-COOLIFY-SIMPLE.md)** - **DEPLOYMENT GUIDE** untuk production
+🚀 **[docs/DEPLOY-COOLIFY.md](./docs/DEPLOY-COOLIFY.md)** - **DEPLOYMENT GUIDE** untuk production
 
 ## ✨ Current Features (v1.0.0)
 
@@ -34,11 +34,17 @@
    # Edit .env.local dengan database dan API keys
    ```
 
-3. **Database Setup**
+3. **PostgreSQL Setup**
 
    ```bash
-   npx prisma migrate dev
-   npx prisma db seed  # Creates default admin user
+   # Option 1: Use Docker (Recommended)
+   npm run postgres:start
+
+   # Option 2: Use migration script
+   ./scripts/migrate-to-postgresql.ps1
+
+   # Option 3: Manual setup
+   npm run db:setup
    ```
 
 4. **Run Development**

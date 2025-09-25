@@ -112,6 +112,10 @@ COPY --from=deps --chown=nextjs:nodejs /app/node_modules/effect ./node_modules/e
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules/fast-check ./node_modules/fast-check
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
+# Copy startup script
+COPY --chown=nextjs:nodejs scripts/start.sh ./start.sh
+RUN chmod +x ./start.sh
+
 # Create data directory for persistent storage
 RUN mkdir -p /app/data /app/.data && \
     chown -R nextjs:nodejs /app/data /app/.data
@@ -126,17 +130,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=15s --start-period=60s --retries=5 \
     CMD wget --no-verbose --tries=2 --timeout=10 --spider http://localhost:3000/api/health || exit 1
 
-# Startup script with enhanced logging and error handling for Coolify v4
-CMD ["sh", "-c", "\
-    echo '[COOLIFY] Starting application container...' && \
-    echo '[COOLIFY] Environment: NODE_ENV=${NODE_ENV}, PORT=${PORT}, HOSTNAME=${HOSTNAME}' && \
-    echo '[COOLIFY] Database URL: ${DATABASE_URL}' && \
-    echo '[COOLIFY] Running database migrations...' && \
-    npx prisma migrate deploy --schema=./prisma/schema.prisma && \
-    echo '[COOLIFY] Running database seed (if needed)...' && \
-    npx prisma db seed || echo '[COOLIFY] Seed not needed or failed, continuing...' && \
-    echo '[COOLIFY] Starting Next.js server on ${HOSTNAME}:${PORT}...' && \
-    echo '[COOLIFY] Health check will be available at http://${HOSTNAME}:${PORT}/api/health' && \
-    echo '[COOLIFY] Default login - Email: admin@localhost, Password: admin123' && \
-    node server.js \
-    "]
+# Use startup script to avoid command complexity
+CMD ["./start.sh"]
