@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { DatabaseService } from '@/lib/database';
 import { getSettings, saveSettings } from '@/lib/settings';
+import jwt from 'jsonwebtoken';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -47,34 +48,53 @@ export async function GET() {
   }
 }
 
+async function verifyAdminSession(
+  req: NextRequest,
+): Promise<{ valid: boolean; userId?: string; error?: string }> {
+  try {
+    // Get token from cookie or Authorization header
+    let token = req.cookies.get('admin-session')?.value;
+    if (!token) {
+      const authHeader = req.headers.get('authorization');
+      token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
+    }
+
+    if (!token) {
+      return { valid: false, error: 'No authentication token provided' };
+    }
+
+    // Verify JWT
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
+
+    if (decoded.sessionType !== 'admin') {
+      return { valid: false, error: 'Invalid session type' };
+    }
+
+    // Verify session still exists and user is admin
+    const user = await DatabaseService.validateSession(token);
+    if (!user || user.role !== 'ADMIN') {
+      return { valid: false, error: 'Invalid or expired session' };
+    }
+
+    return { valid: true, userId: user.id };
+  } catch (error) {
+    return { valid: false, error: 'Invalid authentication token' };
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
-    // Verify admin password - database first, env as fallback for initial setup
-    const providedPassword = req.headers.get('x-admin-password') || '';
+    // Verify admin session instead of password in header
+    const sessionCheck = await verifyAdminSession(req);
+    if (!sessionCheck.valid) {
+      await DatabaseService.logAudit({
+        action: 'ADMIN_UNAUTHORIZED_ACCESS',
+        resource: 'admin_management',
+        details: { reason: sessionCheck.error },
+        ipAddress: req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown',
+        userAgent: req.headers.get('user-agent') || 'unknown',
+      });
 
-    if (!providedPassword) {
-      return Response.json({ error: 'Admin password required' }, { status: 401 });
-    }
-
-    // Try database first - this is the primary method
-    const adminEmail = process.env.ADMIN_EMAIL;
-    if (!adminEmail) {
-      return Response.json({ error: 'Admin email not configured' }, { status: 500 });
-    }
-
-    let adminUser = await DatabaseService.authenticateUser(adminEmail, providedPassword);
-    let isValidPassword = !!adminUser && adminUser.role === 'ADMIN';
-
-    // Fallback to environment variable only if no database admin exists (initial setup)
-    if (!isValidPassword) {
-      const dbAdminExists = await DatabaseService.getAdminInfo();
-      if (!dbAdminExists) {
-        const envAdminPass = process.env.ADMIN_PASSWORD || 'admin';
-        isValidPassword = providedPassword === envAdminPass;
-      }
-    }
-
-    if (!isValidPassword) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -83,16 +103,43 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
+    // Validate input
+    if (!body.type) {
+      return Response.json({ error: 'Operation type is required' }, { status: 400 });
+    }
+
     // Handle different types of updates
-    const { type, ...data } = body;
+    const { type, currentPassword, ...data } = body;
 
     switch (type) {
       case 'admin_credentials':
+        // Verify current password for credential changes
+        if (!currentPassword) {
+          return Response.json(
+            { error: 'Current password is required for credential changes' },
+            { status: 400 },
+          );
+        }
+
+        // Additional verification for credential changes
+        const adminInfo = await DatabaseService.getAdminInfo();
+        if (!adminInfo) {
+          return Response.json({ error: 'Admin user not found' }, { status: 404 });
+        }
+
+        const isValidCurrentPassword = await DatabaseService.authenticateUser(
+          adminInfo.email,
+          currentPassword,
+        );
+        if (!isValidCurrentPassword) {
+          return Response.json({ error: 'Current password is incorrect' }, { status: 401 });
+        }
+
         // Update admin email/password
         const result = await DatabaseService.updateAdminCredentials({
           email: data.adminEmail,
           password: data.adminPassword,
-          currentPassword: providedPassword, // Use current admin password
+          currentPassword: currentPassword,
         });
 
         if (!result.success) {

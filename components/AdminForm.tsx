@@ -111,7 +111,23 @@ export default function AdminForm() {
         return;
       }
 
-      const payload: any = { type: 'admin_credentials' };
+      // Validate password strength if changing
+      if (newAdminPassword) {
+        if (newAdminPassword.length < 8) {
+          setMessage('❌ Password baru minimal 8 karakter');
+          return;
+        }
+        if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(newAdminPassword)) {
+          setMessage('❌ Password harus mengandung huruf besar, kecil, dan angka');
+          return;
+        }
+      }
+
+      const payload: any = {
+        type: 'admin_credentials',
+        currentPassword: password,
+      };
+
       if (newAdminEmail && newAdminEmail !== adminInfo?.email) {
         payload.adminEmail = newAdminEmail;
       }
@@ -126,7 +142,8 @@ export default function AdminForm() {
 
       const res = await fetch('/api/admin/management', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
 
@@ -158,14 +175,21 @@ export default function AdminForm() {
     setMessage(null);
 
     try {
-      if (!password.trim()) {
-        setMessage('❌ Masukkan kata sandi admin');
+      // Validate settings
+      if (settings.maxFileSize && (settings.maxFileSize < 1 || settings.maxFileSize > 50)) {
+        setMessage('❌ Ukuran file maksimal harus antara 1-50 MB');
+        return;
+      }
+
+      if (settings.rateLimit && (settings.rateLimit < 10 || settings.rateLimit > 10000)) {
+        setMessage('❌ Rate limit harus antara 10-10000 per jam');
         return;
       }
 
       const res = await fetch('/api/admin/management', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ type: 'system_settings', ...settings }),
       });
 
@@ -199,21 +223,6 @@ export default function AdminForm() {
 
   return (
     <div className="space-y-6">
-      {/* Admin Authentication */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <label className="block text-sm font-medium mb-2">🔐 Kata Sandi Admin</label>
-        <input
-          type="password"
-          className="border rounded-lg p-3 w-full max-w-xs focus:ring-2 focus:ring-primary-orange/20"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Masukkan kata sandi admin"
-        />
-        <p className="text-xs text-neutral-gray mt-2">
-          Diperlukan untuk menyimpan perubahan sistem
-        </p>
-      </div>
-
       {/* Message Display */}
       {message && (
         <div
@@ -325,6 +334,22 @@ export default function AdminForm() {
               </ul>
             </div>
 
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+              <label className="block text-sm font-medium mb-2">
+                🔐 Konfirmasi Kata Sandi Saat Ini
+              </label>
+              <input
+                type="password"
+                className="border rounded-lg p-3 w-full max-w-xs focus:ring-2 focus:ring-primary-orange/20"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Masukkan kata sandi admin saat ini"
+              />
+              <p className="text-xs text-neutral-gray mt-2">
+                Diperlukan untuk mengubah kredensial admin
+              </p>
+            </div>
+
             <button
               onClick={saveCredentials}
               disabled={saving || !password}
@@ -379,7 +404,7 @@ export default function AdminForm() {
 
             <button
               onClick={saveSettings}
-              disabled={saving || !password}
+              disabled={saving}
               className="px-6 py-3 bg-primary-orange text-white rounded-lg hover:bg-primary-orange/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? 'Menyimpan...' : 'Simpan Pengaturan AI'}
@@ -466,7 +491,7 @@ export default function AdminForm() {
 
             <button
               onClick={saveSettings}
-              disabled={saving || !password}
+              disabled={saving}
               className="px-6 py-3 bg-primary-orange text-white rounded-lg hover:bg-primary-orange/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? 'Menyimpan...' : 'Simpan Pengaturan System'}
@@ -519,7 +544,7 @@ export default function AdminForm() {
 
             <button
               onClick={saveSettings}
-              disabled={saving || !password}
+              disabled={saving}
               className="px-6 py-3 bg-primary-orange text-white rounded-lg hover:bg-primary-orange/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? 'Menyimpan...' : 'Simpan Pengaturan Marketplace'}
@@ -594,7 +619,7 @@ export default function AdminForm() {
 
             <button
               onClick={saveSettings}
-              disabled={saving || !password}
+              disabled={saving}
               className="px-6 py-3 bg-primary-orange text-white rounded-lg hover:bg-primary-orange/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? 'Menyimpan...' : 'Simpan Pengaturan Brand'}
