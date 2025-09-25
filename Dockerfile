@@ -31,8 +31,8 @@ COPY prisma ./prisma/
 RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund && \
     npm cache clean --force
 
-# Install additional dependencies required by Prisma 6.x
-RUN npm install --save effect@^3.9.2
+# Install additional dependencies required by Prisma 6.x and effect package
+RUN npm install --save effect@^3.9.2 fast-check@^3.27.0
 
 # Install Sharp for Alpine Linux musl compatibility (production deps)
 RUN npm install --platform=linux --arch=x64 --libc=musl sharp
@@ -126,9 +126,13 @@ HEALTHCHECK --interval=30s --timeout=15s --start-period=60s --retries=5 \
 CMD ["sh", "-c", "\
     echo '[COOLIFY] Starting application container...' && \
     echo '[COOLIFY] Environment: NODE_ENV=${NODE_ENV}, PORT=${PORT}, HOSTNAME=${HOSTNAME}' && \
+    echo '[COOLIFY] Database URL: ${DATABASE_URL}' && \
     echo '[COOLIFY] Running database migrations...' && \
-    npx prisma migrate deploy --schema=./prisma/schema.prisma || echo '[COOLIFY] Migration failed, continuing...' && \
+    npx prisma migrate deploy --schema=./prisma/schema.prisma && \
+    echo '[COOLIFY] Running database seed (if needed)...' && \
+    npx prisma db seed || echo '[COOLIFY] Seed not needed or failed, continuing...' && \
     echo '[COOLIFY] Starting Next.js server on ${HOSTNAME}:${PORT}...' && \
     echo '[COOLIFY] Health check will be available at http://${HOSTNAME}:${PORT}/api/health' && \
+    echo '[COOLIFY] Default login - Email: admin@localhost, Password: admin123' && \
     node server.js \
     "]
