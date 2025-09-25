@@ -32,6 +32,9 @@ COPY prisma ./prisma/
 RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund && \
     npm cache clean --force
 
+# Install additional dependencies required by Prisma at runtime
+RUN npm install perfect-debounce c12 --no-save
+
 # Generate Prisma client
 RUN npx prisma generate
 # ----------------------
@@ -96,15 +99,8 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy Prisma files (client and schema)
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/.bin ./node_modules/.bin
-## Prisma 6.x transitive deps required at runtime
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/empathic ./node_modules/empathic
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/effect ./node_modules/effect
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/fast-check ./node_modules/fast-check
+# Copy all production dependencies from deps stage
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
 # Copy startup script
