@@ -9,6 +9,8 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '8mb',
     },
+    // Trust proxy headers from Cloudflare Tunnel + Traefik
+    trustHost: true,
   },
 
   // Optimize for Coolify deployment
@@ -19,6 +21,12 @@ const nextConfig = {
   env: {
     COOLIFY_URL: process.env.COOLIFY_URL,
     COOLIFY_FQDN: process.env.COOLIFY_FQDN,
+  },
+
+  // Configure server settings for proxy environments
+  serverRuntimeConfig: {
+    // Tell Next.js we're behind a proxy
+    proxyMode: true,
   },
 
   // Image optimization settings for production
