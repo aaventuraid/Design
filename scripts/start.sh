@@ -20,7 +20,7 @@ echo "[COOLIFY] Checking if seeding is needed..."
 npx prisma db seed 2>/dev/null || echo "[COOLIFY] Seed not needed or failed, continuing..."
 
 echo "[COOLIFY] Starting Next.js server..."
-echo "[COOLIFY] Health check available at http://localhost:${PORT:-3000}/api/health"
+echo "[COOLIFY] Health check available at https://design.yukiyaki.id:${PORT:-3000}/api/health"
 echo "[COOLIFY] Default admin - Email: admin@localhost, Password: admin123"
 
 # Start the application
