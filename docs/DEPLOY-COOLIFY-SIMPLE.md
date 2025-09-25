@@ -440,11 +440,19 @@ NEXTAUTH_URL=https://design.yukiyaki.id
 NODE_ENV=production
 ```
 
-**Variables opsional untuk AI:**
+**⚠️ DEPRECATION NOTICE:**
 
 ```
-GEMINI_API_KEY=your_gemini_api_key_here
-IMAGE_BG_PROVIDER=internal
+# DEPRECATED - No longer needed as environment variables:
+# GEMINI_API_KEY=... # Set via Admin Panel
+# ADMIN credentials   # Auto-created: admin@localhost/admin123
+```
+
+**Optional untuk development:**
+
+```
+CREATE_DEMO_USER=true
+DEMO_USER_PASSWORD=premium123
 ```
 
 ### 📝 **ADMIN USER SETUP (Otomatis)**

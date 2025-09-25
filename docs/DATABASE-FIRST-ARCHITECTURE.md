@@ -54,27 +54,32 @@ geminiApiKey: dbSettingsObj.geminiApiKey || // 🥇 Database priority
 **Setup Awal (Development):**
 
 ```bash
-# 1. Set environment variables untuk seeding
-ADMIN_EMAIL="admin@yourdomain.com"
-ADMIN_PASSWORD="your-secure-password"
-GEMINI_API_KEY="your-api-key"
+# 1. Database seeding runs automatically with default values:
+#    Admin: admin@localhost / admin123
+#    Gemini API: Empty (set via Admin Panel)
 
-# 2. Jalankan database seeding
+# 2. Manual seeding (if needed):
 npm run db:seed
+
+# 3. ✅ NO environment variables needed for seeding
+#    Everything uses built-in defaults
 ```
 
 **Setup Produksi:**
 
 ```bash
-# 1. Deploy dengan minimal env vars
+# 1. Deploy dengan minimal env vars (NO admin credentials needed)
 DATABASE_URL="postgresql://..."
 JWT_SECRET="your-jwt-secret"
-ADMIN_EMAIL="admin@yourdomain.com"  # Setup only
-ADMIN_PASSWORD="secure-password"    # Setup only
+NEXTAUTH_SECRET="your-nextauth-secret"
 
-# 2. Setelah deploy, login ke admin panel
-# 3. Set Gemini API Key melalui UI admin
-# 4. Environment vars untuk credentials tidak lagi diperlukan
+# 2. Database seeding creates admin automatically:
+#    Email: admin@localhost
+#    Password: admin123
+
+# 3. Login ke admin panel dengan default credentials
+# 4. Change admin credentials & set Gemini API Key via UI
+# 5. ✅ NO environment variables needed for credentials
 ```
 
 ### 5. 🛡️ Security Benefits
@@ -130,9 +135,11 @@ await DatabaseService.logAudit({
 
 - [ ] `DATABASE_URL` - Database connection
 - [ ] `JWT_SECRET` - Session encryption
+- [ ] `NEXTAUTH_SECRET` - NextAuth encryption
 - [ ] `NODE_ENV=production` - Runtime environment
-- [ ] `ADMIN_EMAIL` - Setup only (can be removed after seeding)
-- [ ] `ADMIN_PASSWORD` - Setup only (can be removed after seeding)
+- [ ] ~~`ADMIN_EMAIL`~~ - ❌ Not needed (auto-seeding)
+- [ ] ~~`ADMIN_PASSWORD`~~ - ❌ Not needed (auto-seeding)
+- [ ] ~~`GEMINI_API_KEY`~~ - ❌ Set via Admin Panel
 
 ### 8. 🔍 Verification Commands
 

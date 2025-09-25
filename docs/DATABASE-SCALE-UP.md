@@ -127,13 +127,17 @@ DATABASE_URL="file:./dev.db"
 # Authentication
 JWT_SECRET="your-super-secret-jwt-key-change-in-production"
 
-# Admin Setup - CHANGE THESE IN PRODUCTION
-ADMIN_EMAIL="your-secure-admin-email@yourdomain.com"
-ADMIN_PASSWORD="your-secure-admin-password-minimum-12-chars"
+# ⚠️ UPDATED: Database-First Configuration
+# Admin: Auto-created (admin@localhost/admin123) - change via Admin Panel
+# Gemini API: Configure via Admin Panel after deployment
+# These env vars are NO LONGER NEEDED:
+# ADMIN_EMAIL="..."       # ❌ Deprecated
+# ADMIN_PASSWORD="..."    # ❌ Deprecated
+# GEMINI_API_KEY="..."    # ❌ Deprecated
 
-# Existing variables...
-GEMINI_API_KEY=""
-IMAGE_BG_PROVIDER="internal"
+# Optional for development:
+# CREATE_DEMO_USER="true"
+# DEMO_USER_PASSWORD="premium123"
 ```
 
 ### 3. Development Commands
