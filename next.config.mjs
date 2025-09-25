@@ -38,7 +38,7 @@ const nextConfig = {
 
   // Note: NEXT_TELEMETRY_DISABLED=1 environment variable disables telemetry
 
-  // Headers configuration
+  // Headers configuration for reverse proxy
   async headers() {
     return [
       {
@@ -51,6 +51,11 @@ const nextConfig = {
         ],
       },
     ];
+  },
+
+  // Handle redirects properly (prevent redirect loops)
+  async redirects() {
+    return [];
   },
 };
 
