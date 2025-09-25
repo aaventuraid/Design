@@ -32,7 +32,7 @@ RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund && \
     npm cache clean --force
 
 # Install additional dependencies required by Prisma 6.x and effect package
-RUN npm install --save effect@^3.9.2 fast-check@^3.27.0
+RUN npm install --save effect@^3.9.2 fast-check@^4.3.0
 
 # Install Sharp for Alpine Linux musl compatibility (production deps)
 RUN npm install --platform=linux --arch=x64 --libc=musl sharp
