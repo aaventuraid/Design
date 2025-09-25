@@ -2,7 +2,7 @@
 import UploadDropzone from '@/components/UploadDropzone';
 import ImagePreview from '@/components/ImagePreview';
 import CopyGenerator from '@/components/CopyGenerator';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { type MarketplacePreset, getPresetConfig } from '@/lib/marketplace';
 
 export default function HomePage() {
@@ -25,6 +25,42 @@ export default function HomePage() {
   const [compareResults, setCompareResults] = useState<
     { preset: MarketplacePreset; url: string; contentType: string }[]
   >([]);
+  
+  // Homepage content state
+  const [homepageContent, setHomepageContent] = useState({
+    hero_title: 'Studio Foto F&B Profesional',
+    hero_subtitle: 'Transformasi foto makanan Yuki Yaki Corner menjadi background transparan dengan kualitas profesional. Dioptimalkan khusus untuk platform marketplace terpopuler.',
+    hero_cta: 'Mulai Sekarang',
+    features_title: 'Fitur Unggulan',
+    feature1_title: 'Hapus Background',
+    feature1_desc: 'Otomatis menghilangkan background dengan presisi tinggi',
+    feature2_title: 'Preset Marketplace',
+    feature2_desc: 'Penyesuaian khusus untuk setiap platform marketplace',
+    feature3_title: 'Generator Copy AI',
+    feature3_desc: 'Buat judul dan deskripsi menarik secara otomatis'
+  });
+
+  // Fetch homepage content
+  useEffect(() => {
+    const fetchHomepageContent = async () => {
+      try {
+        const response = await fetch('/api/admin/content?section=homepage');
+        const data = await response.json();
+        
+        if (data.success) {
+          const content: Record<string, string> = {};
+          data.data.forEach((item: any) => {
+            content[item.key] = item.value;
+          });
+          setHomepageContent(prev => ({ ...prev, ...content }));
+        }
+      } catch (error) {
+        console.error('Error fetching homepage content:', error);
+      }
+    };
+
+    fetchHomepageContent();
+  }, []);
 
   const onFile = async (
     file: File,
@@ -106,16 +142,14 @@ export default function HomePage() {
               className="text-4xl md:text-6xl font-bold text-transparent bg-gradient-to-r from-primary-orange to-primary-blue bg-clip-text leading-tight"
               style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
             >
-              Studio Foto F&B Profesional
+              {homepageContent.hero_title}
             </h1>
           </div>
           <div className="w-24 h-1 bg-gradient-to-r from-primary-orange to-primary-blue mx-auto rounded-full"></div>
         </div>
 
         <p className="text-xl text-neutral-dark max-w-4xl mx-auto leading-relaxed font-medium">
-          Transformasi foto makanan Yuki Yaki Corner menjadi{' '}
-          <strong className="text-primary-orange">background transparan</strong> dengan kualitas
-          profesional. Dioptimalkan khusus untuk platform marketplace terpopuler.
+          {homepageContent.hero_subtitle}
         </p>
 
         <div className="flex flex-wrap justify-center gap-6 pt-4">
@@ -135,27 +169,27 @@ export default function HomePage() {
             <div className="w-12 h-12 bg-gradient-to-r from-primary-orange to-primary-blue rounded-full flex items-center justify-center">
               <span className="text-white text-xl">✨</span>
             </div>
-            <h3 className="font-semibold text-neutral-dark">Hapus Background</h3>
+            <h3 className="font-semibold text-neutral-dark">{homepageContent.feature1_title}</h3>
             <p className="text-sm text-neutral-gray text-center">
-              Otomatis menghilangkan background dengan presisi tinggi
+              {homepageContent.feature1_desc}
             </p>
           </div>
           <div className="flex flex-col items-center space-y-2 p-4">
             <div className="w-12 h-12 bg-gradient-to-r from-primary-blue to-primary-orange rounded-full flex items-center justify-center">
               <span className="text-white text-xl">🎨</span>
             </div>
-            <h3 className="font-semibold text-neutral-dark">Preset Marketplace</h3>
+            <h3 className="font-semibold text-neutral-dark">{homepageContent.feature2_title}</h3>
             <p className="text-sm text-neutral-gray text-center">
-              Penyesuaian khusus untuk setiap platform
+              {homepageContent.feature2_desc}
             </p>
           </div>
           <div className="flex flex-col items-center space-y-2 p-4">
             <div className="w-12 h-12 bg-gradient-to-r from-primary-orange to-primary-blue rounded-full flex items-center justify-center">
               <span className="text-white text-xl">🤖</span>
             </div>
-            <h3 className="font-semibold text-neutral-dark">Generator Copy AI</h3>
+            <h3 className="font-semibold text-neutral-dark">{homepageContent.feature3_title}</h3>
             <p className="text-sm text-neutral-gray text-center">
-              Buat judul dan deskripsi menarik secara otomatis
+              {homepageContent.feature3_desc}
             </p>
           </div>
         </div>

@@ -1,11 +1,13 @@
 'use client';
 import AdminForm from '@/components/AdminForm';
+import ContentManagement from '@/components/ContentManagement';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function AdminPage() {
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [activeTab, setActiveTab] = useState<'settings' | 'content'>('content');
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -21,7 +23,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-8">
       <div className="text-center space-y-4">
         <div className="flex justify-between items-center">
           <div></div>
@@ -40,12 +42,41 @@ export default function AdminPage() {
         </div>
         <h1 className="text-3xl font-bold text-neutral-dark">Panel Pengaturan</h1>
         <p className="text-neutral-gray max-w-2xl mx-auto">
-          Kelola konfigurasi AI, pengaturan sistem, dan preferensi aplikasi Yuki Yaki Corner Studio
-          Foto F&B
+          Kelola konten website dan konfigurasi sistem Yuki Yaki Corner Studio Foto F&B
         </p>
       </div>
 
-      <AdminForm />
+      {/* Tab Navigation */}
+      <div className="flex justify-center">
+        <div className="flex bg-gray-100 rounded-lg p-1">
+          <button
+            onClick={() => setActiveTab('content')}
+            className={`px-6 py-2 rounded-md font-medium transition-colors ${
+              activeTab === 'content'
+                ? 'bg-white text-primary-orange shadow-sm'
+                : 'text-neutral-gray hover:text-neutral-dark'
+            }`}
+          >
+            Content Management
+          </button>
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`px-6 py-2 rounded-md font-medium transition-colors ${
+              activeTab === 'settings'
+                ? 'bg-white text-primary-orange shadow-sm'
+                : 'text-neutral-gray hover:text-neutral-dark'
+            }`}
+          >
+            System Settings
+          </button>
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      <div className="bg-gray-50 rounded-lg p-6">
+        {activeTab === 'content' && <ContentManagement />}
+        {activeTab === 'settings' && <AdminForm />}
+      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Poppins, Montserrat, Inter } from 'next/font/google';
 import { AuthProvider } from '@/components/AuthProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { Toaster } from 'react-hot-toast';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -30,6 +31,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header />
           <main className="flex-1 container mx-auto px-4 py-6">{children}</main>
           <Footer />
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#fff',
+                color: '#1E1E1E',
+                border: '1px solid #F28C28',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#F28C28',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
         </AuthProvider>
       </body>
     </html>

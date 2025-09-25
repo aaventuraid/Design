@@ -160,6 +160,36 @@ model SystemSettings {
   @@map("system_settings")
 }
 
+// Model SiteContent - Dynamic Content Management
+model SiteContent {
+  id          String @id @default(cuid())
+  section     String // header, footer, homepage, etc.
+  key         String // logo_url, site_title, hero_text, etc.
+  value       String @db.Text
+  valueType   SiteContentType @default(TEXT)
+  
+  // Metadata
+  label       String? // Human readable label for admin
+  description String? // Help text for admin
+  category    String? // Group related settings
+  sortOrder   Int?    // Display order in admin
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([section, key])
+  @@map("site_contents")
+}
+
+enum SiteContentType {
+  TEXT
+  HTML
+  URL
+  IMAGE
+  JSON
+}
+
 // Model AuditLog - Audit Trail
 model AuditLog {
   id       String @id @default(cuid())
