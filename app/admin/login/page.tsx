@@ -101,10 +101,6 @@ export default function AdminLoginPage() {
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
-
-          <div className="text-center">
-            <div className="text-sm text-gray-600">Default: admin@localhost / admin123</div>
-          </div>
         </form>
       </div>
     </div>

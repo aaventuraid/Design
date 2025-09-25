@@ -32,9 +32,8 @@ async function main() {
       },
     });
 
-    console.log(`✅ Default admin user created: ${admin.email}`);
-    console.log(`🔑 Default password: ${defaultPassword}`);
-    console.log(`⚠️  IMPORTANT: Change credentials after first login!`);
+    console.log(`✅ Default admin user created`);
+    console.log(`⚠️  IMPORTANT: Change default credentials after first login!`);
   } else {
     console.log(`ℹ️  Database already has ${userCount} user(s), skipping admin creation`);
   }
@@ -101,9 +100,9 @@ async function main() {
         },
       });
 
-      console.log(`✅ Premium user created: ${premium.email}`);
+      console.log(`✅ Premium user created`);
     } else {
-      console.log(`ℹ️  Premium user already exists: ${existingPremium.email}`);
+      console.log(`ℹ️  Premium user already exists`);
     }
   } else {
     console.log('ℹ️  Skipping demo user creation in production');

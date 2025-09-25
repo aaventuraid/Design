@@ -22,7 +22,12 @@ prisma/dev.db*
 .env.test.local
 .env.production.local
 .env.*.local
+.env.production
 *.env
+.data/
+credentials.json
+secrets.json
+api-keys.json
 
 # Package Manager Files
 pnpm-lock.yaml

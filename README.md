@@ -38,7 +38,7 @@
 
    ```bash
    npx prisma migrate dev
-   npx prisma db seed  # Creates default admin: admin@localhost / admin123
+   npx prisma db seed  # Creates default admin user
    ```
 
 4. **Run Development**
@@ -49,8 +49,8 @@
 
 5. **First Login**
    - Open http://localhost:3000/auth
-   - Login dengan: `admin@localhost` / `admin123`
-   - **PENTING**: Segera ganti email dan password!
+   - Login dengan default credentials (see deployment documentation)
+   - **PENTING**: Segera ganti email dan password setelah login pertama!
 
 ## 🏗️ Architecture
 

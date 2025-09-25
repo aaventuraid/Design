@@ -67,10 +67,8 @@ if [ "$NODE_ENV" = "production" ]; then
               }
             }
           });
-          console.log('✅ Default admin user created successfully');
-          console.log('📧 Email: admin@localhost');
-          console.log('🔑 Password: admin123');
-          console.log('⚠️  IMPORTANT: Change password after first login!');
+          echo '[COOLIFY] ✅ Default admin user created successfully'
+          echo '[COOLIFY] ⚠️  IMPORTANT: Change default credentials after first login!'
         } else {
           console.log('ℹ️  Users already exist, skipping default admin setup...');
         }
