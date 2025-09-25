@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
@@ -21,7 +22,8 @@
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f app",
-    "coolify:setup": "chmod +x scripts/coolify-start.sh"
+    "coolify:setup": "chmod +x scripts/coolify-start.sh",
+    "ci": "npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
