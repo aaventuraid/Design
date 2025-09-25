@@ -1,79 +1,49 @@
-# 🍽️ Yuki Yaki Corner - AI-Powered F&B Content Generator
+# Yuki Yaki Corner
 
-**Production-Ready**: Next.js application yang mengubah 1 foto makanan menjadi konten marketing siap pakai dengan AI copy generation, background removal otomatis, dan optimasi untuk platform F&B marketplace.
+A Next.js application optimized for production deployment with Coolify.
 
-## 📋 **Complete Documentation**
+## Production Deployment
 
-🎯 **[docs/PROJECT-GUIDE.md](./docs/PROJECT-GUIDE.md)** - **PANDUAN LENGKAP** project overview, architecture, roadmap, dan development guide
+This application is configured for deployment using Docker with Coolify:
 
-🚀 **[docs/DEPLOY-COOLIFY.md](./docs/DEPLOY-COOLIFY.md)** - **DEPLOYMENT GUIDE** untuk production
+1. The application uses a multi-stage Dockerfile optimized for production
+2. Database migrations are handled automatically via Prisma
+3. Environment variables are managed through Coolify
 
-## ✨ Current Features (v1.0.0)
+## Environment Variables
 
-- ✅ **Smart Background Removal** - Otomatis hapus background putih/terang
-- ✅ **AI Copy Generation** - Generate judul & deskripsi produk dengan Gemini AI
-- ✅ **Marketplace Presets** - GoFood, GrabFood, ShopeeFood, Instagram optimization
-- ✅ **Database-First Architecture** - Settings & credentials aman di database
-- ✅ **Multi-User Support** - Admin panel dengan role-based access (USER/PREMIUM/ADMIN)
-- ✅ **Production Ready** - Docker, security audit compliant, comprehensive documentation
+Configure these environment variables in your Coolify panel:
 
-## 🚀 Quick Start
+### Required Variables
+- `DATABASE_URL` - PostgreSQL connection string (e.g., `postgresql://user:password@host:port/database`)
+- `JWT_SECRET` - Secret key for JWT token signing (generate a secure random string)
+- `NEXT_PUBLIC_APP_URL` - Public URL of your application (e.g., `https://yourdomain.com`)
 
-1. **Clone & Install**
+### Optional Variables
+- `NODE_ENV` - Set to `production` (usually auto-configured by Coolify)
+- `PORT` - Port number (default: 3000, usually auto-configured by Coolify)
+- `HOSTNAME` - Host binding (default: 0.0.0.0, usually auto-configured by Coolify)
 
-   ```bash
-   git clone <repo-url>
-   cd yuki-yaki-corner
-   npm install
-   ```
+### Coolify Configuration
+1. In your Coolify panel, go to your application settings
+2. Navigate to "Environment Variables" section
+3. Add each variable with its corresponding value
+4. Deploy your application
 
-2. **Setup Environment**
+**Note**: Do not include `.env` files in production. All environment variables should be configured directly in Coolify panel for security and proper deployment management.
 
-   ```bash
-   cp .env.template .env.local
-   # Edit .env.local dengan database dan API keys
-   ```
+## Scripts
 
-3. **PostgreSQL Setup**
+- `npm run build` - Build the application for production
+- `npm run start` - Start the production server
+- `npm run db:generate` - Generate Prisma client
+- `npm run db:migrate:prod` - Run database migrations
+- `npm run db:seed` - Seed the database
 
-   ```bash
-   # Option 1: Use Docker (Recommended)
-   npm run postgres:start
+## Tech Stack
 
-   # Option 2: Use migration script
-   ./scripts/migrate-to-postgresql.ps1
-
-   # Option 3: Manual setup
-   npm run db:setup
-   ```
-
-4. **Run Development**
-
-   ```bash
-   npm run dev
-   ```
-
-5. **First Login**
-   - Open http://localhost:3000/auth
-   - Login dengan default credentials (see deployment documentation)
-   - **PENTING**: Segera ganti email dan password setelah login pertama!
-
-## 🏗️ Architecture
-
-**Database-First Design**: Settings & API keys stored securely in database
-**Tech Stack**: Next.js 14 + TypeScript + Tailwind + Prisma + PostgreSQL
-**AI Integration**: Gemini API (primary) dengan local fallback
-**Security**: JWT auth, bcrypt hashing, rate limiting, audit logs
-**DevOps**: Docker ready, Coolify optimized, comprehensive monitoring
-
-## 🔗 Links & Resources
-
-**Repository**: https://github.com/aaventuraid/Design.git  
-**Documentation**: Complete guides in [`docs/`](./docs/) folder  
-**Admin Panel**: `/admin` (post-deployment)  
-**API Health**: `/api/health` (monitoring endpoint)
-
-## 📄 License
-
-Proprietary – Internal Yuki Yaki Corner Studio  
-© 2025 - AI-Powered F&B Content Generation Platform
+- Next.js 15
+- TypeScript
+- Prisma
+- PostgreSQL
+- Tailwind CSS
