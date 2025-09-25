@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
+    "@prisma/config": "^6.16.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "bcryptjs": "^3.0.2",
@@ -63,8 +64,5 @@
     "*.{css,md,json}": [
       "prettier --write"
     ]
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   }
 }

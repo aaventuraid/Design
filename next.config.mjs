@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const isProd = process.env.NODE_ENV === 'production';
 const nextConfig = {
-  // Always use standalone output for production deployments
-  output: 'standalone',
+  // Use standalone output only in production (avoid dev depending on build artifacts)
+  ...(isProd ? { output: 'standalone' } : {}),
 
   // Experimental features
   experimental: {

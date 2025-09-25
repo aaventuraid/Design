@@ -106,6 +106,10 @@ COPY --from=deps --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules/.bin ./node_modules/.bin
+## Prisma 6.x transitive deps required at runtime
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/empathic ./node_modules/empathic
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/effect ./node_modules/effect
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/fast-check ./node_modules/fast-check
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
 # Create data directory for persistent storage
