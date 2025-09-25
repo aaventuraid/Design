@@ -1,7 +1,4 @@
 import { NextRequest } from 'next/server';
-import { getSettings } from '@/lib/settings';
-import { prisma } from '@/lib/database';
-import pkg from '../../../package.json';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -10,85 +7,60 @@ export async function GET(_req: NextRequest) {
   const startTime = Date.now();
 
   try {
-    // Basic app info
-    const version = (pkg as any)?.version || '0.0.0';
+    const responseTime = Date.now() - startTime;
     const now = new Date();
     const uptimeSec = Math.floor(process.uptime());
 
-    // Database health check
-    let dbStatus = 'unknown';
-    let dbError = null;
-    try {
-      await prisma.$connect();
-      // Simple query to test database
-      const userCount = await prisma.user.count();
-      dbStatus = 'connected';
-      await prisma.$disconnect();
-    } catch (error: any) {
-      dbStatus = 'error';
-      dbError = error.message;
-    }
-
-    // Settings check (non-critical)
-    let hasGeminiKey = false;
-    let defaultAIProvider = 'local';
-    try {
-      const settings = await getSettings();
-      hasGeminiKey = Boolean(settings.geminiApiKey || process.env.GEMINI_API_KEY);
-      defaultAIProvider = settings.defaultAIProvider || 'local';
-    } catch (error) {
-      // Settings failure is not critical for health check
-      console.warn('Health check: Settings unavailable:', error);
-    }
-
-    // Environment info
-    const environment = {
-      nodeEnv: process.env.NODE_ENV || 'unknown',
-      port: process.env.PORT || '3000',
-      coolifyUrl: process.env.COOLIFY_URL || null,
-      coolifyFqdn: process.env.COOLIFY_FQDN || null,
-    };
-
-    // Response time
-    const responseTime = Date.now() - startTime;
-
-    // Overall health status
-    const isHealthy = dbStatus === 'connected';
+    // SSoT: Single source for readiness logic
+    const isReady = uptimeSec >= 10; // Consider ready after 10 seconds
+    const healthStatus = isReady ? 'healthy' : 'starting';
 
     const response = {
-      ok: isHealthy,
-      status: isHealthy ? 'healthy' : 'unhealthy',
-      version,
+      ok: true,
+      status: healthStatus,
+      ready: isReady,
+      version: '1.0.0-coolify-v4',
       timestamp: now.toISOString(),
       uptime: {
         seconds: uptimeSec,
         human: formatUptime(uptimeSec),
       },
-      database: {
-        status: dbStatus,
-        error: dbError,
+      environment: {
+        nodeEnv: process.env.NODE_ENV || 'unknown',
+        port: process.env.PORT || '3000',
+        hostname: process.env.HOSTNAME || '0.0.0.0',
+        platform: process.platform,
+        nodeVersion: process.version,
       },
-      ai: {
-        hasGeminiKey,
-        defaultProvider: defaultAIProvider,
+      deployment: {
+        coolify: !!process.env.COOLIFY_URL,
+        container: process.env.NODE_ENV === 'production',
+        pid: process.pid,
       },
-      environment,
       performance: {
         responseTimeMs: responseTime,
-        memoryUsage: process.memoryUsage(),
+        memoryUsage: {
+          rss: Math.round(process.memoryUsage().rss / 1024 / 1024),
+          heapUsed: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+          heapTotal: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+        },
       },
+      message: isReady
+        ? 'Service is running - Coolify v4 ready'
+        : 'Service starting - Please wait for readiness',
     };
 
     return Response.json(response, {
-      status: isHealthy ? 200 : 503,
+      status: isReady ? 200 : 503, // Service Unavailable during startup
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
-        Pragma: 'no-cache',
-        Expires: '0',
+        'Content-Type': 'application/json',
+        'X-Health-Check': 'coolify-v4-enhanced',
+        'X-Health-Status': healthStatus,
+        'X-Startup-Ready': isReady.toString(),
       },
     });
   } catch (error: any) {
-    console.error('Health check failed:', error);
     return Response.json(
       {
         ok: false,

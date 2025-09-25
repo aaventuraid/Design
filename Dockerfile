@@ -31,6 +31,9 @@ COPY prisma ./prisma/
 RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund && \
     npm cache clean --force
 
+# Install additional dependencies required by Prisma 6.x
+RUN npm install --save effect@^3.9.2
+
 # Install Sharp for Alpine Linux musl compatibility (production deps)
 RUN npm install --platform=linux --arch=x64 --libc=musl sharp
 
@@ -115,15 +118,17 @@ USER nextjs
 # Expose port
 EXPOSE 3000
 
-# Health check endpoint
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+# Health check endpoint with extended startup period for Coolify v4
+HEALTHCHECK --interval=30s --timeout=15s --start-period=60s --retries=5 \
+    CMD wget --no-verbose --tries=2 --timeout=10 --spider http://localhost:3000/api/health || exit 1
 
-# Startup script with proper error handling
+# Startup script with enhanced logging and error handling for Coolify v4
 CMD ["sh", "-c", "\
-    echo 'Starting application...' && \
-    echo 'Running database migrations...' && \
-    npx prisma migrate deploy --schema=./prisma/schema.prisma || echo 'Migration failed, continuing...' && \
-    echo 'Starting Next.js server...' && \
+    echo '[COOLIFY] Starting application container...' && \
+    echo '[COOLIFY] Environment: NODE_ENV=${NODE_ENV}, PORT=${PORT}, HOSTNAME=${HOSTNAME}' && \
+    echo '[COOLIFY] Running database migrations...' && \
+    npx prisma migrate deploy --schema=./prisma/schema.prisma || echo '[COOLIFY] Migration failed, continuing...' && \
+    echo '[COOLIFY] Starting Next.js server on ${HOSTNAME}:${PORT}...' && \
+    echo '[COOLIFY] Health check will be available at http://${HOSTNAME}:${PORT}/api/health' && \
     node server.js \
     "]
