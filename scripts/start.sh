@@ -19,7 +19,7 @@ ATTEMPT=1
 while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
     echo "[COOLIFY] Database connection attempt $ATTEMPT/$MAX_ATTEMPTS..."
     
-    if npx prisma db execute --stdin <<< "SELECT 1;" >/dev/null 2>&1; then
+    if echo "SELECT 1;" | npx prisma db execute --stdin >/dev/null 2>&1; then
         echo "[COOLIFY] Database connection successful!"
         break
     else
