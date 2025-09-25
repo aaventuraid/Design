@@ -1,17 +1,8 @@
 /** @type {import('next').NextConfig} */
 const isProd = process.env.NODE_ENV === 'production';
 const nextConfig = {
-  // Use standalone output only in production (avoid dev depending on build artifacts)
-  ...(isProd ? { output: 'standalone' } : {}),
-
-  // Experimental features
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '8mb',
-    },
-    // Trust proxy headers from Cloudflare Tunnel + Traefik
-    trustHost: true,
-  },
+  // Disable standalone output for better development experience
+  // ...(isProd ? { output: 'standalone' } : {}),
 
   // Optimize for Coolify deployment
   trailingSlash: false,
