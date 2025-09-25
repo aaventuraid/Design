@@ -1,5 +1,7 @@
 # Multi-stage Dockerfile optimized for Coolify v4 deployment
-FROM node:20-alpine AS base
+# Allow overriding the base image (useful if Docker Hub is rate-limited in CI/CD)
+ARG BASE_IMAGE=node:20-alpine
+FROM ${BASE_IMAGE} AS base
 
 # Install system dependencies for Prisma, Sharp, and wget (for health checks)
 RUN apk add --no-cache \
@@ -18,6 +20,8 @@ ENV TZ=Asia/Jakarta
 # ----------------------
 FROM base AS deps
 WORKDIR /app
+ARG SOURCE_COMMIT
+RUN echo "Building commit: ${SOURCE_COMMIT}" || true
 
 # Copy package files and prisma schema
 COPY package.json package-lock.json* ./
