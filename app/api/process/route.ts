@@ -1,9 +1,9 @@
-import { NextRequest } from 'next/server';
+// NextRequest import removed as not needed
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   const startTime = Date.now();
 
   try {

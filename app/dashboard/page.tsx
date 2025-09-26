@@ -41,7 +41,7 @@ export default function DashboardPage() {
     if (user && token) {
       fetchAnalytics();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user, token]);
 
   if (isLoading) {

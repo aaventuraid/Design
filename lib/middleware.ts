@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DatabaseService } from '@/lib/database';
+import { extractBearerToken } from '@/lib/utils';
 
 // Middleware untuk autentikasi
 export async function withAuth(
@@ -7,8 +8,7 @@ export async function withAuth(
   handler: (request: NextRequest, user: any) => Promise<NextResponse>,
 ) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const token = authHeader?.replace('Bearer ', '');
+    const token = extractBearerToken(request);
 
     if (!token) {
       return NextResponse.json({ error: 'Token diperlukan' }, { status: 401 });
@@ -49,8 +49,7 @@ export async function withRateLimit(
   try {
     // Get user from token (optional)
     let user = null;
-    const authHeader = request.headers.get('authorization');
-    const token = authHeader?.replace('Bearer ', '');
+    const token = extractBearerToken(request);
 
     if (token) {
       user = await DatabaseService.validateSession(token);

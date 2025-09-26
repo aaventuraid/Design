@@ -3,6 +3,7 @@ import { getSettings } from '@/lib/settings';
 import { AIService } from '@/lib/ai-service';
 import { getClientIP } from '@/lib/middleware';
 import { DatabaseService } from '@/lib/database';
+import { extractBearerToken } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -11,8 +12,7 @@ export async function POST(req: NextRequest) {
   try {
     // Database-based rate limiting dan auth
     let user = null;
-    const authHeader = req.headers.get('authorization');
-    const token = authHeader?.replace('Bearer ', '');
+    const token = extractBearerToken(req);
 
     if (token) {
       user = await DatabaseService.validateSession(token);

@@ -379,7 +379,7 @@ export default function HomePage() {
                       {cfg.format.toUpperCase()}
                     </div>
                   </div>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  { }
                   <img
                     src={r.url}
                     alt={cfg.name}

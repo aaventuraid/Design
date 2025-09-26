@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DatabaseService } from '@/lib/database';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
+// import bcrypt from 'bcryptjs'; // Unused for now
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
     );
 
     // Save session to database
-    const session = await DatabaseService.createSession(user.id);
+    await DatabaseService.createSession(user.id);
 
     // Log successful login
     await DatabaseService.logAudit({
@@ -164,7 +164,7 @@ export async function DELETE(req: NextRequest) {
           ipAddress: req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown',
           userAgent: req.headers.get('user-agent') || 'unknown',
         });
-      } catch (e) {
+      } catch {
         // Invalid token, but still clear cookie
       }
     }

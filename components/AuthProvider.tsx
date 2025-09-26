@@ -1,15 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-interface User {
-  id: string;
-  email: string;
-  username?: string;
-  role: 'ADMIN' | 'USER' | 'PREMIUM';
-  createdAt?: string;
-  lastLoginAt?: string;
-}
+import { User } from '@/lib/types';
 
 interface AuthContextType {
   user: User | null;
@@ -57,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // Network error, keep current state but show warning
             console.warn('Unable to verify auth token');
           });
-      } catch (error) {
+      } catch {
         // Invalid saved data
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user_data');

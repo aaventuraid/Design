@@ -49,7 +49,7 @@ export default function ImagePreview({
 
             {original ? (
               <div className="bg-gray-50 rounded-xl overflow-hidden border">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+                { }
                 <img
                   src={original}
                   alt="Foto asli"
@@ -109,7 +109,7 @@ export default function ImagePreview({
                       }}
                     ></div>
                   )}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  { }
                   <img
                     src={processed}
                     alt="Hasil proses"

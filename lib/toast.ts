@@ -1,4 +1,4 @@
-type ToastType = 'success' | 'error' | 'info';
+import { ToastType } from './types';
 
 export function showToast(message: string, type: ToastType = 'info', duration = 2000) {
   if (typeof document === 'undefined') return;

@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { DatabaseService } from '@/lib/database';
 import { getSettings, saveSettings } from '@/lib/settings';
+import { extractAuthToken } from '@/lib/utils';
 import jwt from 'jsonwebtoken';
 
 export const dynamic = 'force-dynamic';
@@ -55,8 +56,7 @@ async function verifyAdminSession(
     // Get token from cookie or Authorization header
     let token = req.cookies.get('admin-session')?.value;
     if (!token) {
-      const authHeader = req.headers.get('authorization');
-      token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined;
+      token = extractAuthToken(req) || undefined;
     }
 
     if (!token) {
@@ -77,7 +77,7 @@ async function verifyAdminSession(
     }
 
     return { valid: true, userId: user.id };
-  } catch (error) {
+  } catch {
     return { valid: false, error: 'Invalid authentication token' };
   }
 }

@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
 // Admin analytics (semua data)
 export async function POST(request: NextRequest) {
-  return withAdminAuth(request, async (_, __) => {
+  return withAdminAuth(request, async () => {
     try {
       const { userId } = await request.json();
 

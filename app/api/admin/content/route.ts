@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { database } from '@/lib/database';
+import { prisma } from '@/lib/database';
 import { z } from 'zod';
 
 // Schema untuk validasi input
@@ -27,11 +27,11 @@ export async function GET(request: NextRequest) {
     const section = searchParams.get('section');
     const category = searchParams.get('category');
 
-    let where: any = {};
+    const where: Record<string, unknown> = {};
     if (section) where.section = section;
     if (category) where.category = category;
 
-    const contents = await database.prisma.siteContent.findMany({
+        const contents = await prisma.siteContent.findMany({
       where,
       orderBy: [
         { category: 'asc' },
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = SiteContentSchema.parse(body);
 
-    const content = await database.prisma.siteContent.create({
+    const content = await prisma.siteContent.create({
       data: validatedData
     });
 
@@ -102,7 +102,7 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const validatedData = UpdateContentSchema.parse(body);
 
-    const content = await database.prisma.siteContent.update({
+    const content = await prisma.siteContent.update({
       where: {
         section_key: {
           section,
@@ -147,7 +147,7 @@ export async function DELETE(request: NextRequest) {
       }, { status: 400 });
     }
 
-    await database.prisma.siteContent.delete({
+    await prisma.siteContent.delete({
       where: {
         section_key: {
           section,

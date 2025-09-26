@@ -46,7 +46,7 @@ export default function AuthForm({ onLogin }: AuthFormProps) {
       localStorage.setItem('user_data', JSON.stringify(data.user));
 
       onLogin(data.token, data.user);
-    } catch (error) {
+    } catch {
       setError('Terjadi kesalahan jaringan');
     } finally {
       setIsLoading(false);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DatabaseService } from '@/lib/database';
+import { extractBearerToken } from '@/lib/utils';
 
 // Explicitly mark this route as dynamic
 export const dynamic = 'force-dynamic';
@@ -7,8 +8,7 @@ export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const token = authHeader?.replace('Bearer ', '');
+    const token = extractBearerToken(request);
 
     if (!token) {
       return NextResponse.json({ error: 'Token diperlukan' }, { status: 400 });

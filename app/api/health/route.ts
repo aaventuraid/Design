@@ -1,9 +1,10 @@
-import { NextRequest } from 'next/server';
+// NextRequest import removed as not needed
+import { formatUptime } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   const startTime = Date.now();
 
   try {
@@ -78,14 +79,4 @@ export async function GET(_req: NextRequest) {
   }
 }
 
-function formatUptime(seconds: number): string {
-  const days = Math.floor(seconds / (24 * 3600));
-  const hours = Math.floor((seconds % (24 * 3600)) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-
-  if (days > 0) return `${days}d ${hours}h ${minutes}m ${secs}s`;
-  if (hours > 0) return `${hours}h ${minutes}m ${secs}s`;
-  if (minutes > 0) return `${minutes}m ${secs}s`;
-  return `${secs}s`;
-}
+// formatUptime imported from utils
