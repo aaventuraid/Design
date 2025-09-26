@@ -13,7 +13,7 @@ async function main() {
     console.log('🔐 Creating default admin user...');
 
     // Use default credentials that must be changed after first login
-    const defaultEmail = 'admin@localhost';
+    const defaultEmail = 'admin@yukiyaki.id';
     const defaultPassword = 'admin123';
     const passwordHash = await bcrypt.hash(defaultPassword, 12);
 

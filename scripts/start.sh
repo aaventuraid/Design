@@ -73,7 +73,7 @@ fi
 
 echo "[COOLIFY] Starting Next.js server..."
 echo "[COOLIFY] Health check available at http://localhost:${PORT:-3000}/api/health"
-echo "[COOLIFY] Default admin - Email: admin@localhost, Password: admin123"
+echo "[COOLIFY] Default admin - Email: admin@yukiyaki.id, Password: admin123"
 
 # Start the application
 exec node server.js
