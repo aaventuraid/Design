@@ -32,19 +32,38 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Check admin authentication
+  // Check admin authentication using regular auth system
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/admin/auth');
+        // Get token from localStorage (regular auth system)
+        const token = localStorage.getItem('auth-token');
+        if (!token) {
+          router.push('/auth');
+          return;
+        }
+
+        const response = await fetch('/api/auth/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
         if (response.ok) {
           const data = await response.json();
+          // Check if user has admin role
+          if (data.user.role !== 'ADMIN') {
+            router.push('/auth');
+            return;
+          }
           setUser(data.user);
         } else {
-          router.push('/admin/login');
+          localStorage.removeItem('auth-token');
+          router.push('/auth');
         }
       } catch {
-        router.push('/admin/login');
+        localStorage.removeItem('auth-token');
+        router.push('/auth');
       } finally {
         setLoading(false);
       }
@@ -55,11 +74,22 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/admin/auth', { method: 'DELETE' });
+      const token = localStorage.getItem('auth-token');
+      if (token) {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      }
+      localStorage.removeItem('auth-token');
       toast.success('Logged out successfully');
-      router.push('/admin/login');
+      router.push('/auth');
     } catch {
+      localStorage.removeItem('auth-token');
       toast.error('Error logging out');
+      router.push('/auth');
     }
   };
 

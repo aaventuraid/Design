@@ -145,6 +145,47 @@ export async function POST(req: NextRequest) {
   }
 }
 
+export async function GET(req: NextRequest) {
+  try {
+    const token = req.cookies.get('admin-session')?.value;
+    
+    if (!token) {
+      return NextResponse.json({ error: 'No admin session found' }, { status: 401 });
+    }
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
+      
+      // Check if session exists in database
+      const session = await DatabaseService.getSessionByToken(token);
+      if (!session) {
+        return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
+      }
+
+      // Get user info
+      const user = await DatabaseService.getUserById(decoded.userId);
+      if (!user || user.role !== 'ADMIN') {
+        return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+        },
+      });
+    } catch {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+  } catch (error: any) {
+    console.error('Admin auth check error:', error);
+    return NextResponse.json({ error: 'Authentication check failed' }, { status: 500 });
+  }
+}
+
 export async function DELETE(req: NextRequest) {
   try {
     const token = req.cookies.get('admin-session')?.value;

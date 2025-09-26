@@ -42,8 +42,8 @@ export default function AuthForm({ onLogin }: AuthFormProps) {
       }
 
       // Store token dan user data
-      localStorage.setItem('auth_token', data.token);
-      localStorage.setItem('user_data', JSON.stringify(data.user));
+      localStorage.setItem('auth-token', data.token);
+      localStorage.setItem('user-data', JSON.stringify(data.user));
 
       onLogin(data.token, data.user);
     } catch {

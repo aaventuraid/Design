@@ -11,7 +11,12 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (user) {
-      router.push('/dashboard');
+      // Redirect admin users to admin panel, others to dashboard
+      if (user.role === 'ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
     }
   }, [user, router]);
 

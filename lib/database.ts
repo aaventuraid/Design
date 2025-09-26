@@ -412,4 +412,19 @@ export class DatabaseService {
       presetStats,
     };
   }
+
+  // Session management methods
+  static async getSessionByToken(token: string): Promise<Session | null> {
+    return prisma.session.findUnique({
+      where: { token },
+      include: { user: true },
+    });
+  }
+
+  // User management methods
+  static async getUserById(userId: string): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { id: userId },
+    });
+  }
 }

@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: yuki-yaki-db
+    environment:
+      POSTGRES_DB: yuki_yaki_db
+      POSTGRES_USER: yuki_user
+      POSTGRES_PASSWORD: yuki_password_2025
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yuki_user -d yuki_yaki_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - yuki-network
+
+  # Yuki Yaki Corner Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yuki-yaki-app
+    command: ["node", "server.js"]
+    environment:
+      # Database Configuration
+      DATABASE_URL: "postgresql://yuki_user:yuki_password_2025@postgres:5432/yuki_yaki_db"
+      
+      # JWT & Auth Configuration
+      JWT_SECRET: "yuki-yaki-jwt-secret-production-2025"
+      NEXTAUTH_SECRET: "yuki-yaki-nextauth-secret-production-2025"
+      NEXTAUTH_URL: "http://localhost:3000"
+      
+      # App Configuration
+      NODE_ENV: "production"
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+      
+      # Image Processing
+      IMAGE_BG_PROVIDER: "internal"
+      
+      # For testing - will create demo premium user
+      CREATE_DEMO_USER: "true"
+      DEMO_USER_PASSWORD: "premium123"
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - app_data:/app/data
+      - app_uploads:/app/.data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=2", "--timeout=10", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 15s
+      start_period: 60s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - yuki-network
+
+volumes:
+  postgres_data:
+    driver: local
+  app_data:
+    driver: local
+  app_uploads:
+    driver: local
+
+networks:
+  yuki-network:
+    driver: bridge

@@ -20,8 +20,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Load from localStorage on mount
-    const savedToken = localStorage.getItem('auth_token');
-    const savedUser = localStorage.getItem('user_data');
+    const savedToken = localStorage.getItem('auth-token');
+    const savedUser = localStorage.getItem('user-data');
 
     if (savedToken && savedUser) {
       try {
@@ -36,8 +36,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .then(async (res) => {
             if (!res.ok) {
               // Token invalid, clear auth
-              localStorage.removeItem('auth_token');
-              localStorage.removeItem('user_data');
+              localStorage.removeItem('auth-token');
+              localStorage.removeItem('user-data');
               setToken(null);
               setUser(null);
             } else {
@@ -51,8 +51,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
       } catch {
         // Invalid saved data
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user_data');
+        localStorage.removeItem('auth-token');
+        localStorage.removeItem('user-data');
       }
     }
 
@@ -62,8 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = (newToken: string, userData: User) => {
     setToken(newToken);
     setUser(userData);
-    localStorage.setItem('auth_token', newToken);
-    localStorage.setItem('user_data', JSON.stringify(userData));
+    localStorage.setItem('auth-token', newToken);
+    localStorage.setItem('user-data', JSON.stringify(userData));
   };
 
   const logout = async () => {
@@ -80,8 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setToken(null);
     setUser(null);
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_data');
+    localStorage.removeItem('auth-token');
+    localStorage.removeItem('user-data');
   };
 
   return (
