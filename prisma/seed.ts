@@ -4,6 +4,54 @@ import bcrypt from 'bcryptjs';
 // Prisma client instance
 const prisma = new PrismaClient();
 
+// Default system settings (idempotent)
+// Stored with a uniform shape: { value: <primitive|object> }
+// Categories align with admin settings API sections
+const defaultSystemSettings = [
+  // General
+  { key: 'siteName', value: { value: 'Yuki Yaki Corner' }, category: 'general', description: 'Public site name' },
+  { key: 'siteDescription', value: { value: 'AI-Powered Food Content Platform' }, category: 'general', description: 'Short site description' },
+  { key: 'adminEmail', value: { value: 'admin@yukiyaki.id' }, category: 'general', description: 'Primary admin contact email' },
+  { key: 'timezone', value: { value: 'Asia/Jakarta' }, category: 'general', description: 'Default application timezone' },
+  { key: 'language', value: { value: 'id' }, category: 'general', description: 'Default language code' },
+  { key: 'maintenance', value: { value: false }, category: 'general', description: 'Maintenance mode flag' },
+
+  // SEO
+  { key: 'metaTitle', value: { value: 'Yuki Yaki Corner - AI Food Content Platform' }, category: 'seo', description: 'Default meta title' },
+  { key: 'metaDescription', value: { value: 'Generate engaging social media content for food businesses with AI' }, category: 'seo', description: 'Default meta description' },
+  { key: 'keywords', value: { value: 'AI, food content, social media, marketing, optimization' }, category: 'seo', description: 'SEO keywords list' },
+
+  // Security
+  { key: 'passwordMinLength', value: { value: 8 }, category: 'security', description: 'Minimum password length' },
+  { key: 'requireSpecialChars', value: { value: true }, category: 'security', description: 'Require special characters in password' },
+  { key: 'sessionTimeout', value: { value: 30 }, category: 'security', description: 'Session timeout in minutes' },
+  { key: 'maxLoginAttempts', value: { value: 5 }, category: 'security', description: 'Maximum login attempts before lockout' },
+  { key: 'enableTwoFactor', value: { value: false }, category: 'security', description: 'Enable 2FA globally' },
+  { key: 'allowRegistration', value: { value: false }, category: 'security', description: 'Allow public user self-registration' },
+
+  // API
+  { key: 'rateLimit', value: { value: 100 }, category: 'api', description: 'Default per-hour API rate limit' },
+  { key: 'enableCors', value: { value: true }, category: 'api', description: 'Enable CORS handling' },
+  { key: 'corsOrigins', value: { value: '*' }, category: 'api', description: 'Allowed CORS origins' },
+
+  // Backup
+  { key: 'autoBackup', value: { value: false }, category: 'backup', description: 'Automatic backup enabled' },
+  { key: 'backupFrequency', value: { value: 'daily' }, category: 'backup', description: 'Backup frequency' },
+  { key: 'backupRetention', value: { value: 30 }, category: 'backup', description: 'Retention days for backups' },
+  { key: 'backupLocation', value: { value: '/backups' }, category: 'backup', description: 'Backup storage location' },
+];
+
+async function seedSystemSettings() {
+  for (const setting of defaultSystemSettings) {
+    await prisma.systemSettings.upsert({
+      where: { key: setting.key },
+      update: {},
+      create: setting as any,
+    });
+  }
+  console.log('✅ Default system settings ensured');
+}
+
 // Default site content (idempotent)
 const defaultSiteContent = [
     // Header content
