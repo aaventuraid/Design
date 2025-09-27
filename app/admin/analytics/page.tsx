@@ -3,7 +3,7 @@
 import AdminLayout from '@/components/AdminLayout';
 import { PageHeader, Card, LoadingSpinner } from '@/components/admin/AdminComponents';
 import { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
+import { showToast } from '@/lib/toast';
 import { formatNumber, formatPercentage, formatDuration, formatTimeAgo } from '@/lib/utils';
 
 interface AnalyticsData {
@@ -135,7 +135,7 @@ export default function AnalyticsPage() {
       
       setData(mockData);
     } catch (error) {
-      toast.error('Error fetching analytics data');
+      showToast('Error fetching analytics data', 'error');
       console.error('Error:', error);
     } finally {
       setLoading(false);

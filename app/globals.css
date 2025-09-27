@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,10 +8,31 @@
   --color-primary-blue: 43 58 103; /* #2B3A67 */
   --color-neutral-dark: 30 30 30; /* #1E1E1E */
   --color-neutral-gray: 74 74 74; /* #4A4A4A */
+  --color-accent-white: 255 255 255; /* #FFFFFF */
 }
 
+/* Brand Typography Standards */
 body {
-  @apply bg-white text-neutral-dark;
+  @apply bg-accent-white text-neutral-dark font-inter;
+  line-height: 1.6;
+}
+
+/* Headings use Poppins/Montserrat as per brand guideline */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-poppins font-bold;
+  line-height: 1.2;
+}
+
+h1 { @apply text-4xl md:text-5xl lg:text-6xl; }
+h2 { @apply text-3xl md:text-4xl lg:text-5xl; }
+h3 { @apply text-2xl md:text-3xl; }
+h4 { @apply text-xl md:text-2xl; }
+h5 { @apply text-lg md:text-xl; }
+h6 { @apply text-base md:text-lg; }
+
+/* Body text uses Inter for optimal readability */
+p, .body-text {
+  @apply font-inter;
 }
 
 /* Dark mode (respects class .dark on html) */
@@ -23,6 +45,108 @@ body {
 .dark .text-neutral-gray { @apply text-gray-300; }
 .dark .border-gray-200 { @apply border-gray-600; }
 .dark .bg-gray-50 { @apply bg-neutral-800; }
+
+/* Brand Button Components */
+.btn {
+  @apply inline-flex items-center justify-center px-6 py-3 rounded-brand font-poppins font-semibold transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+}
+
+.btn-primary {
+  @apply btn bg-primary-orange text-white hover:bg-primary-orange/90 hover:shadow-brand-hover focus-visible:ring-primary-orange/50;
+}
+
+.btn-secondary {
+  @apply btn bg-primary-blue text-white hover:bg-primary-blue/90 hover:shadow-brand-blue focus-visible:ring-primary-blue/50;
+}
+
+.btn-outline {
+  @apply btn border-2 border-primary-orange text-primary-orange bg-transparent hover:bg-primary-orange hover:text-white focus-visible:ring-primary-orange/50;
+}
+
+.btn-ghost {
+  @apply btn text-neutral-dark hover:bg-neutral-gray/10 focus-visible:ring-neutral-gray/50;
+}
+
+.btn-sm {
+  @apply px-4 py-2 text-sm;
+}
+
+.btn-lg {
+  @apply px-8 py-4 text-lg;
+}
+
+/* Brand Card Components */
+.card {
+  @apply bg-white rounded-brand-lg border border-gray-100 shadow-sm hover:shadow-brand transition-all duration-300;
+}
+
+.card-elevated {
+  @apply card shadow-brand;
+}
+
+/* Brand Input Components */
+.input {
+  @apply w-full px-4 py-3 rounded-brand border border-gray-200 bg-white text-neutral-dark placeholder-neutral-gray/60 focus:border-primary-orange focus:ring-2 focus:ring-primary-orange/20 focus:outline-none transition-colors font-inter;
+}
+
+.input-error {
+  @apply border-red-300 focus:border-red-500 focus:ring-red-200;
+}
+
+/* Brand Text Styles */
+.text-brand-gradient {
+  @apply text-transparent bg-gradient-to-r from-primary-orange to-primary-blue bg-clip-text;
+}
+
+.text-title {
+  @apply font-montserrat font-bold text-neutral-dark;
+}
+
+.text-subtitle {
+  @apply font-poppins font-semibold text-neutral-gray;
+}
+
+.text-body {
+  @apply font-inter text-neutral-dark;
+}
+
+.text-caption {
+  @apply font-inter text-sm text-neutral-gray;
+}
+
+/* Brand Spacing & Layout */
+.section-padding {
+  @apply py-12 md:py-16 lg:py-20;
+}
+
+.container-brand {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Brand Animations */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 /* Improve default focus styles for accessibility */
 :focus-visible {
@@ -43,10 +167,39 @@ body {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+  
+  .animate-fade-in,
+  .animate-slide-up {
+    animation: none;
+  }
 }
 
-.btn {
-  @apply rounded-xl px-4 py-2 font-semibold transition-colors;
+/* Japanese-inspired geometric patterns for brand identity */
+.pattern-sakura {
+  background-image: radial-gradient(circle at 25% 25%, rgba(242, 140, 40, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 75% 75%, rgba(43, 58, 103, 0.1) 0%, transparent 50%);
+}
+
+/* Brand-specific loading states */
+.loading-brand {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-brand::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(242, 140, 40, 0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
 }
 
 .btn-primary {

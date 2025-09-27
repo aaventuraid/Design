@@ -1,6 +1,6 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Poppins, Montserrat, Inter } from 'next/font/google';
+import { Poppins, Montserrat, Inter, Lato } from 'next/font/google';
 import { AuthProvider } from '@/components/AuthProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -10,13 +10,26 @@ const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '600', '700'],
   variable: '--font-poppins',
+  display: 'swap',
 });
 const montserrat = Montserrat({
   subsets: ['latin'],
   weight: ['600', '700'],
   variable: '--font-montserrat',
+  display: 'swap',
 });
-const inter = Inter({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-inter' });
+const inter = Inter({ 
+  subsets: ['latin'], 
+  weight: ['400', '500'], 
+  variable: '--font-inter',
+  display: 'swap',
+});
+const lato = Lato({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-lato',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Yuki Yaki Corner – Image Pro Studio',
@@ -53,8 +66,8 @@ export const viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={`${poppins.variable} ${montserrat.variable} ${inter.variable}`}>       
-      <body className="min-h-screen flex flex-col">
+    <html lang="id" className={`${poppins.variable} ${montserrat.variable} ${inter.variable} ${lato.variable}`}>       
+      <body className="min-h-screen flex flex-col antialiased">
         <script
           dangerouslySetInnerHTML={{
             __html: `(() => {try { const pref = localStorage.getItem('theme'); if (pref==='dark' || (!pref && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark'); } catch(e) {}})();`,

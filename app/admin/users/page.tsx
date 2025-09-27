@@ -3,7 +3,7 @@
 import AdminLayout from '@/components/AdminLayout';
 import { PageHeader, Card, Button, Input, LoadingSpinner } from '@/components/admin/AdminComponents';
 import { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
+import { showToast } from '@/lib/toast';
 import { User } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
 
@@ -81,7 +81,7 @@ export default function UserManagementPage() {
       
       setUsers(mockUsers);
     } catch (error) {
-      toast.error('Error fetching users');
+      showToast('Error fetching users', 'error');
       console.error('Error:', error);
     } finally {
       setLoading(false);
@@ -91,7 +91,7 @@ export default function UserManagementPage() {
   // Save user (create or update)
   const saveUser = async () => {
     if (!formData.name || !formData.email) {
-      toast.error('Name and email are required');
+      showToast('Name and email are required', 'error');
       return;
     }
 
@@ -108,7 +108,7 @@ export default function UserManagementPage() {
             ? { ...user, ...formData, id: editingUser.id }
             : user
         ));
-        toast.success('User updated successfully');
+        showToast('User updated successfully', 'success');
       } else {
         // Create new user
         const newUser: User = {
@@ -118,7 +118,7 @@ export default function UserManagementPage() {
           createdAt: new Date().toISOString()
         };
         setUsers(prev => [newUser, ...prev]);
-        toast.success('User created successfully');
+        showToast('User created successfully', 'success');
       }
       
       // Reset form
@@ -127,7 +127,7 @@ export default function UserManagementPage() {
       setEditingUser(null);
       
     } catch (error) {
-      toast.error('Error saving user');
+      showToast('Error saving user', 'error');
       console.error('Error:', error);
     } finally {
       setSaving(false);
@@ -145,9 +145,9 @@ export default function UserManagementPage() {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       setUsers(prev => prev.filter(user => user.id !== userId));
-      toast.success('User deleted successfully');
+      showToast('User deleted successfully', 'success');
     } catch (error) {
-      toast.error('Error deleting user');
+      showToast('Error deleting user', 'error');
       console.error('Error:', error);
     }
   };
@@ -158,9 +158,9 @@ export default function UserManagementPage() {
       setUsers(prev => prev.map(user => 
         user.id === userId ? { ...user, status } : user
       ));
-      toast.success('User status updated successfully');
+      showToast('User status updated successfully', 'success');
     } catch (error) {
-      toast.error('Error updating user status');
+      showToast('Error updating user status', 'error');
       console.error('Error:', error);
     }
   };

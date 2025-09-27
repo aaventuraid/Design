@@ -19,22 +19,25 @@ export function StatsCard({ title, value, change, changeType = 'neutral', icon, 
   }[changeType];
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-neutral-gray">{title}</p>
-          <p className="text-2xl font-bold text-neutral-dark mt-1">{value}</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-neutral-gray truncate">{title}</p>
+          <p className="text-xl sm:text-2xl font-bold text-neutral-dark mt-1">{value}</p>
           {change && (
-            <p className={`text-sm mt-1 ${changeColorClass}`}>
-              {changeType === 'positive' ? '↗️' : changeType === 'negative' ? '↘️' : '➡️'} {change}
+            <p className={`text-xs sm:text-sm mt-1 ${changeColorClass}`}>
+              <span aria-hidden="true">
+                {changeType === 'positive' ? '↗️' : changeType === 'negative' ? '↘️' : '➡️'}
+              </span>{' '}
+              {change}
             </p>
           )}
           {description && (
-            <p className="text-xs text-neutral-gray mt-2">{description}</p>
+            <p className="text-xs text-neutral-gray mt-2 truncate">{description}</p>
           )}
         </div>
-        <div className="w-12 h-12 bg-gradient-to-r from-primary-orange to-primary-blue rounded-lg flex items-center justify-center">
-          <span className="text-white text-xl">{icon}</span>
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-primary-orange to-primary-blue rounded-lg flex items-center justify-center flex-shrink-0 ml-4">
+          <span className="text-white text-lg sm:text-xl" aria-hidden="true">{icon}</span>
         </div>
       </div>
     </div>
@@ -49,16 +52,16 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, action }: PageHeaderProps) {
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between">
+    <div className="mb-6 sm:mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-dark">{title}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-neutral-dark">{title}</h1>
           {description && (
-            <p className="text-neutral-gray mt-1">{description}</p>
+            <p className="text-neutral-gray mt-1 text-sm sm:text-base">{description}</p>
           )}
         </div>
         {action && (
-          <div>{action}</div>
+          <div className="flex-shrink-0">{action}</div>
         )}
       </div>
     </div>
@@ -100,59 +103,7 @@ export function Card({ title, description, children, className = '', actions }: 
   );
 }
 
-interface ButtonProps {
-  children: ReactNode;
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  disabled?: boolean;
-  loading?: boolean;
-  onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
-  className?: string;
-}
 
-export function Button({ 
-  children, 
-  variant = 'primary', 
-  size = 'md', 
-  disabled = false, 
-  loading = false,
-  onClick,
-  type = 'button',
-  className = ''
-}: ButtonProps) {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-  
-  const variantClasses = {
-    primary: 'bg-primary-orange hover:bg-primary-orange/90 text-white focus:ring-primary-orange',
-    secondary: 'bg-primary-blue hover:bg-primary-blue/90 text-white focus:ring-primary-blue',
-    danger: 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500',
-    ghost: 'bg-transparent hover:bg-gray-100 text-neutral-gray hover:text-neutral-dark focus:ring-gray-300'
-  };
-
-  const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base'
-  };
-
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled || loading}
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
-    >
-      {loading && (
-        <svg className="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-        </svg>
-      )}
-      {children}
-    </button>
-  );
-}
 
 interface InputProps {
   label?: string;
@@ -280,5 +231,117 @@ export function LoadingSpinner({ size = 'md', className = '' }: LoadingSpinnerPr
 
   return (
     <div className={`animate-spin rounded-full border-b-2 border-primary-orange ${sizeClasses[size]} ${className}`} />
+  );
+}
+
+interface ButtonProps {
+  children: ReactNode;
+  onClick?: () => void;
+  type?: 'button' | 'submit' | 'reset';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  loading?: boolean;
+  className?: string;
+}
+
+export function Button({ 
+  children, 
+  onClick, 
+  type = 'button',
+  variant = 'primary',
+  size = 'md',
+  disabled = false,
+  loading = false,
+  className = ''
+}: ButtonProps) {
+  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
+  
+  const variantClasses = {
+    primary: 'bg-primary-orange text-white hover:bg-primary-orange/90 focus:ring-primary-orange',
+    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500',
+    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+    ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-500'
+  };
+
+  const sizeClasses = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-sm',
+    lg: 'px-6 py-3 text-base'
+  };
+
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled || loading}
+      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${
+        disabled || loading ? 'opacity-50 cursor-not-allowed' : ''
+      } ${className}`}
+    >
+      {loading && <LoadingSpinner size="sm" className="mr-2" />}
+      {children}
+    </button>
+  );
+}
+
+interface SelectProps {
+  label?: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: Array<{ value: string; label: string; disabled?: boolean }>;
+  placeholder?: string;
+  required?: boolean;
+  disabled?: boolean;
+  error?: string;
+  help?: string;
+  className?: string;
+}
+
+export function Select({ 
+  label, 
+  value, 
+  onChange, 
+  options,
+  placeholder,
+  required = false, 
+  disabled = false,
+  error,
+  help,
+  className = ''
+}: SelectProps) {
+  return (
+    <div className={className}>
+      {label && (
+        <label className="block text-sm font-medium text-neutral-dark mb-2">
+          {label}
+          {required && <span className="text-red-500 ml-1">*</span>}
+        </label>
+      )}
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        required={required}
+        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-orange focus:border-transparent transition-colors ${
+          error 
+            ? 'border-red-300 bg-red-50' 
+            : 'border-gray-300 bg-white hover:border-gray-400'
+        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      >
+        {placeholder && <option value="">{placeholder}</option>}
+        {options.map((option) => (
+          <option key={option.value} value={option.value} disabled={option.disabled}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {error && (
+        <p className="text-sm text-red-600 mt-1">{error}</p>
+      )}
+      {help && !error && (
+        <p className="text-sm text-neutral-gray mt-1">{help}</p>
+      )}
+    </div>
   );
 }

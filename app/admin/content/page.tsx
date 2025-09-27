@@ -3,7 +3,7 @@
 import AdminLayout from '@/components/AdminLayout';
 import { PageHeader, Card, Input, Textarea, LoadingSpinner } from '@/components/admin/AdminComponents';
 import { useState, useEffect, useCallback } from 'react';
-import { toast } from 'react-hot-toast';
+import { showToast } from '@/lib/toast';
 
 interface SiteContent {
   id: string;
@@ -42,10 +42,10 @@ export default function ContentManagementPage() {
       if (data.success) {
         setContents(data.data);
       } else {
-        toast.error('Failed to fetch content');
+        showToast('Failed to fetch content', 'error');
       }
     } catch (error) {
-      toast.error('Error fetching content');
+      showToast('Error fetching content', 'error');
       console.error('Error:', error);
     } finally {
       setLoading(false);
@@ -67,17 +67,17 @@ export default function ContentManagementPage() {
       const data = await response.json();
       
       if (data.success) {
-        toast.success('Content updated successfully');
+        showToast('Content updated successfully', 'success');
         setContents(prev => prev.map(content => 
           content.section === section && content.key === key 
             ? { ...content, value, updatedAt: new Date() as any } 
             : content
         ));
       } else {
-        toast.error(data.error || 'Failed to update content');
+        showToast(data.error || 'Failed to update content', 'error');
       }
     } catch (error) {
-      toast.error('Error updating content');
+      showToast('Error updating content', 'error');
       console.error('Error:', error);
     } finally {
       setSaving(null);
@@ -103,12 +103,12 @@ export default function ContentManagementPage() {
       
       if (data.success) {
         await updateContent(section, key, data.data.url);
-        toast.success('File uploaded successfully');
+        showToast('File uploaded successfully', 'success');
       } else {
-        toast.error(data.error || 'Failed to upload file');
+        showToast(data.error || 'Failed to upload file', 'error');
       }
     } catch (error) {
-      toast.error('Error uploading file');
+      showToast('Error uploading file', 'error');
       console.error('Error:', error);
     } finally {
       setUploading(null);

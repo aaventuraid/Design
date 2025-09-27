@@ -3,7 +3,7 @@
 import { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { toast } from 'react-hot-toast';
+import { showToast } from '@/lib/toast';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -84,11 +84,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         });
       }
       localStorage.removeItem('auth-token');
-      toast.success('Logged out successfully');
+      showToast('Logged out successfully', 'success');
       router.push('/auth');
     } catch {
       localStorage.removeItem('auth-token');
-      toast.error('Error logging out');
+      showToast('Error logging out', 'error');
       router.push('/auth');
     }
   };
@@ -123,8 +123,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto ${
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
         <div className="flex flex-col h-full">
           {/* Logo */}
@@ -138,24 +138,25 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
+          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto" role="navigation" aria-label="Admin navigation">
             {navigation.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group ${
                     isActive
                       ? 'bg-primary-orange text-white shadow-sm'
-                      : 'text-neutral-gray hover:bg-gray-100 hover:text-neutral-dark'
+                      : 'text-neutral-gray hover:bg-gray-100 hover:text-neutral-dark hover:shadow-sm'
                   }`}
                   onClick={() => setSidebarOpen(false)}
+                  aria-current={isActive ? 'page' : undefined}
                 >
-                  <span className="text-lg">{item.icon}</span>
-                  <span>{item.label}</span>
+                  <span className="text-lg flex-shrink-0" aria-hidden="true">{item.icon}</span>
+                  <span className="flex-1">{item.label}</span>
                   {item.badge && (
-                    <span className="ml-auto bg-primary-blue text-white text-xs px-2 py-1 rounded-full">
+                    <span className="ml-auto bg-primary-blue text-white text-xs px-2 py-1 rounded-full font-medium">
                       {item.badge}
                     </span>
                   )}
@@ -165,10 +166,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </nav>
 
           {/* User info */}
-          <div className="px-4 py-4 border-t border-gray-200">
+          <div className="px-4 py-4 border-t border-gray-200 bg-gray-50">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-primary-blue to-primary-orange rounded-full flex items-center justify-center">
-                <span className="text-white font-medium">
+              <div className="w-10 h-10 bg-gradient-to-r from-primary-blue to-primary-orange rounded-full flex items-center justify-center shadow-sm">
+                <span className="text-white font-semibold text-sm">
                   {user?.username?.charAt(0)?.toUpperCase() || 'A'}
                 </span>
               </div>
@@ -177,31 +178,33 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   {user?.username || 'Admin'}
                 </p>
                 <p className="text-xs text-neutral-gray truncate">
-                  {user?.email}
+                  {user?.email || 'admin@yukiyaki.com'}
                 </p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full px-4 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors text-left"
+              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200 group"
+              aria-label="Logout from admin panel"
             >
-              🚪 Logout
+              <span className="text-base group-hover:scale-110 transition-transform" aria-hidden="true">🚪</span>
+              <span>Logout</span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="lg:ml-64">
+      <div className="flex-1 lg:ml-64">
         {/* Top header */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
+        <header className="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-200">
           <div className="flex items-center justify-between px-4 py-4">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-md text-neutral-gray hover:text-neutral-dark hover:bg-gray-100"
+                className="lg:hidden p-2 rounded-md text-neutral-gray hover:text-neutral-dark hover:bg-gray-100 transition-colors"
+                aria-label="Open sidebar"
               >
-                <span className="sr-only">Open sidebar</span>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
@@ -247,7 +250,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </header>
 
         {/* Page content */}
-        <main className="p-6">
+        <main className="p-4 sm:p-6 min-h-screen">
           {children}
         </main>
       </div>

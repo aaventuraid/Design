@@ -3,7 +3,7 @@
 import AdminLayout from '@/components/AdminLayout';
 import { PageHeader, Card, Button, Input, Textarea, LoadingSpinner } from '@/components/admin/AdminComponents';
 import { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
+import { showToast } from '@/lib/toast';
 import { formatDate } from '@/lib/utils';
 
 interface Settings {
@@ -113,10 +113,10 @@ export default function SettingsPage() {
       if (data.success) {
         setSettings(data.data);
       } else {
-        toast.error(data.error || 'Failed to fetch settings');
+        showToast(data.error || 'Failed to fetch settings');
       }
     } catch (error) {
-      toast.error('Error fetching settings');
+      showToast('Error fetching settings');
       console.error('Error:', error);
     } finally {
       setLoading(false);
@@ -146,12 +146,12 @@ export default function SettingsPage() {
       const data = await response.json();
       
       if (data.success) {
-        toast.success(data.message || `${section.charAt(0).toUpperCase() + section.slice(1)} settings saved successfully`);
+        showToast(data.message || `${section.charAt(0).toUpperCase() + section.slice(1)} settings saved successfully`);
       } else {
-        toast.error(data.error || 'Failed to save settings');
+        showToast(data.error || 'Failed to save settings');
       }
     } catch (error) {
-      toast.error('Error saving settings');
+      showToast('Error saving settings');
       console.error('Error:', error);
     } finally {
       setSaving(null);
@@ -188,12 +188,12 @@ export default function SettingsPage() {
       
       if (data.success) {
         updateSettings('api', 'apiKey', data.data.apiKey);
-        toast.success(data.message || 'New API key generated');
+        showToast(data.message || 'New API key generated');
       } else {
-        toast.error(data.error || 'Failed to generate API key');
+        showToast(data.error || 'Failed to generate API key');
       }
     } catch (error) {
-      toast.error('Error generating API key');
+      showToast('Error generating API key');
       console.error('Error:', error);
     }
   };
@@ -206,9 +206,9 @@ export default function SettingsPage() {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       updateSettings('backup', 'lastBackup', new Date().toISOString());
-      toast.success('Backup created successfully');
+      showToast('Backup created successfully');
     } catch (error) {
-      toast.error('Error creating backup');
+      showToast('Error creating backup');
       console.error('Error:', error);
     } finally {
       setSaving(null);

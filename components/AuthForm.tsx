@@ -64,97 +64,132 @@ export default function AuthForm({ onLogin }: AuthFormProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            {mode === 'login' ? 'Masuk ke Akun' : 'Daftar Akun Baru'}
-          </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-blue/5 via-white to-primary-orange/5 py-12 px-4 sm:px-6 lg:px-8 pattern-sakura">
+      <div className="max-w-lg w-full space-y-10">
+        {/* Header */}
+        <div className="text-center space-y-6">
+          <div className="inline-block">
+            <div className="w-20 h-20 bg-gradient-to-br from-primary-orange to-primary-blue rounded-brand-xl mx-auto flex items-center justify-center shadow-brand-hover">
+              <span className="text-white text-3xl">🍜</span>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-title text-4xl text-brand-gradient">
+              {mode === 'login' ? 'Masuk ke Akun' : 'Daftar Akun Baru'}
+            </h2>
+            <p className="text-body">
+              {mode === 'login' 
+                ? 'Selamat datang kembali di studio foto F&B profesional' 
+                : 'Bergabunglah dengan komunitas F&B Indonesia'}
+            </p>
+          </div>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
 
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Alamat email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
-
-            {mode === 'register' && (
-              <div>
-                <label htmlFor="username" className="sr-only">
-                  Username
-                </label>
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Username (opsional)"
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                />
+        {/* Form */}
+        <div className="card-elevated p-8 bg-white/80 backdrop-blur-sm">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-brand border-l-4 border-l-red-500">
+                <div className="flex items-center gap-2">
+                  <span className="text-red-500">⚠️</span>
+                  <span className="font-medium">Error:</span>
+                </div>
+                <p className="mt-1 text-sm">{error}</p>
               </div>
             )}
 
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-subtitle text-sm">
+                  Alamat Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className="input"
+                  placeholder="contoh@email.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+              </div>
+
+              {mode === 'register' && (
+                <div className="space-y-2">
+                  <label htmlFor="username" className="text-subtitle text-sm">
+                    Username (Opsional)
+                  </label>
+                  <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    className="input"
+                    placeholder="username_anda"
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-subtitle text-sm">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className="input"
+                  placeholder="Masukkan password yang kuat"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                />
+              </div>
             </div>
-          </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              {isLoading ? 'Memproses...' : mode === 'login' ? 'Masuk' : 'Daftar'}
-            </button>
-          </div>
+            <div className="space-y-4">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`btn-primary w-full h-14 text-lg ${isLoading ? 'loading-brand' : ''}`}
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    Memproses...
+                  </div>
+                ) : (
+                  mode === 'login' ? 'Masuk ke Akun' : 'Daftar Sekarang'
+                )}
+              </button>
 
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setMode(mode === 'login' ? 'register' : 'login');
-                setError('');
-                setFormData({ email: '', username: '', password: '' });
-              }}
-              className="text-blue-600 hover:text-blue-500"
-            >
-              {mode === 'login' ? 'Belum punya akun? Daftar' : 'Sudah punya akun? Masuk'}
-            </button>
-          </div>
-        </form>
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode(mode === 'login' ? 'register' : 'login');
+                    setError('');
+                    setFormData({ email: '', username: '', password: '' });
+                  }}
+                  className="text-body hover:text-primary-orange transition-colors font-medium"
+                >
+                  {mode === 'login' 
+                    ? 'Belum punya akun? Daftar di sini' 
+                    : 'Sudah punya akun? Masuk di sini'}
+                </button>
+              </div>
+            </div>
+          </form>
 
-        {/* Testing accounts removed for production security */}
+          {/* Additional Info */}
+          <div className="mt-6 p-4 bg-gradient-to-r from-primary-orange/5 to-primary-blue/5 rounded-brand border border-primary-orange/20">
+            <p className="text-caption text-center">
+              🔒 Data Anda aman dan terenkripsi dengan standar industri
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

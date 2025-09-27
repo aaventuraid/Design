@@ -133,64 +133,88 @@ export default function HomePage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {/* Hero Section */}
-      <section className="text-center space-y-6 py-12">
-        <div className="space-y-4">
-          <div className="inline-block">
-            <h1
-              className="text-4xl md:text-6xl font-bold text-transparent bg-gradient-to-r from-primary-orange to-primary-blue bg-clip-text leading-tight"
-              style={{ fontFamily: 'var(--font-montserrat), sans-serif' }}
-            >
-              {homepageContent.hero_title}
-            </h1>
-          </div>
-          <div className="w-24 h-1 bg-gradient-to-r from-primary-orange to-primary-blue mx-auto rounded-full"></div>
-        </div>
-
-        <p className="text-xl text-neutral-dark max-w-4xl mx-auto leading-relaxed font-medium">
-          {homepageContent.hero_subtitle}
-        </p>
-
-        <div className="flex flex-wrap justify-center gap-6 pt-4">
-          <div className="flex items-center gap-2 bg-primary-orange/10 px-4 py-2 rounded-full">
-            <span className="text-primary-orange font-semibold">GoFood</span>
-          </div>
-          <div className="flex items-center gap-2 bg-primary-blue/10 px-4 py-2 rounded-full">
-            <span className="text-primary-blue font-semibold">GrabFood</span>
-          </div>
-          <div className="flex items-center gap-2 bg-primary-orange/10 px-4 py-2 rounded-full">
-            <span className="text-primary-orange font-semibold">ShopeeFood</span>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto pt-8">
-          <div className="flex flex-col items-center space-y-2 p-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-primary-orange to-primary-blue rounded-full flex items-center justify-center">
-              <span className="text-white text-xl">✨</span>
+      <section className="text-center section-padding pattern-sakura">
+        <div className="container-brand">
+          <div className="space-y-8">
+            <div className="space-y-6 animate-fade-in">
+              <div className="inline-block">
+                <h1 className="text-brand-gradient font-montserrat text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
+                  {homepageContent.hero_title}
+                </h1>
+              </div>
+              <div className="w-24 h-1.5 bg-gradient-to-r from-primary-orange to-primary-blue mx-auto rounded-full shadow-brand"></div>
             </div>
-            <h3 className="font-semibold text-neutral-dark">{homepageContent.feature1_title}</h3>
-            <p className="text-sm text-neutral-gray text-center">
-              {homepageContent.feature1_desc}
-            </p>
-          </div>
-          <div className="flex flex-col items-center space-y-2 p-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-primary-blue to-primary-orange rounded-full flex items-center justify-center">
-              <span className="text-white text-xl">🎨</span>
+
+            <div className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+              <p className="text-xl md:text-2xl text-body max-w-5xl mx-auto leading-relaxed font-medium">
+                {homepageContent.hero_subtitle}
+              </p>
             </div>
-            <h3 className="font-semibold text-neutral-dark">{homepageContent.feature2_title}</h3>
-            <p className="text-sm text-neutral-gray text-center">
-              {homepageContent.feature2_desc}
-            </p>
-          </div>
-          <div className="flex flex-col items-center space-y-2 p-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-primary-orange to-primary-blue rounded-full flex items-center justify-center">
-              <span className="text-white text-xl">🤖</span>
+
+            {/* Platform badges */}
+            <div className="flex flex-wrap justify-center gap-4 pt-6 animate-slide-up" style={{ animationDelay: '400ms' }}>
+              <div className="flex items-center gap-3 bg-gradient-to-r from-primary-orange/10 to-primary-orange/5 px-6 py-3 rounded-brand-xl border border-primary-orange/20 shadow-brand hover:shadow-brand-hover transition-all duration-300">
+                <div className="w-8 h-8 bg-primary-orange rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">G</span>
+                </div>
+                <span className="text-primary-orange font-poppins font-semibold">GoFood</span>
+              </div>
+              <div className="flex items-center gap-3 bg-gradient-to-r from-primary-blue/10 to-primary-blue/5 px-6 py-3 rounded-brand-xl border border-primary-blue/20 shadow-brand hover:shadow-brand-hover transition-all duration-300">
+                <div className="w-8 h-8 bg-primary-blue rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">G</span>
+                </div>
+                <span className="text-primary-blue font-poppins font-semibold">GrabFood</span>
+              </div>
+              <div className="flex items-center gap-3 bg-gradient-to-r from-primary-orange/10 to-primary-orange/5 px-6 py-3 rounded-brand-xl border border-primary-orange/20 shadow-brand hover:shadow-brand-hover transition-all duration-300">
+                <div className="w-8 h-8 bg-primary-orange rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">S</span>
+                </div>
+                <span className="text-primary-orange font-poppins font-semibold">ShopeeFood</span>
+              </div>
             </div>
-            <h3 className="font-semibold text-neutral-dark">{homepageContent.feature3_title}</h3>
-            <p className="text-sm text-neutral-gray text-center">
-              {homepageContent.feature3_desc}
-            </p>
+
+            {/* Features grid */}
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto pt-12">
+              {[
+                {
+                  title: homepageContent.feature1_title,
+                  desc: homepageContent.feature1_desc,
+                  icon: '✨',
+                  gradient: 'from-primary-orange to-primary-blue',
+                  delay: '600ms'
+                },
+                {
+                  title: homepageContent.feature2_title,
+                  desc: homepageContent.feature2_desc,
+                  icon: '🎨',
+                  gradient: 'from-primary-blue to-primary-orange',
+                  delay: '700ms'
+                },
+                {
+                  title: homepageContent.feature3_title,
+                  desc: homepageContent.feature3_desc,
+                  icon: '🤖',
+                  gradient: 'from-primary-orange to-primary-blue',
+                  delay: '800ms'
+                }
+              ].map((feature, index) => (
+                <div 
+                  key={index}
+                  className="card-elevated flex flex-col items-center space-y-4 p-8 hover:scale-105 transition-all duration-300 animate-slide-up"
+                  style={{ animationDelay: feature.delay }}
+                >
+                  <div className={`w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-brand-xl flex items-center justify-center shadow-brand hover:shadow-brand-hover transition-all duration-300`}>
+                    <span className="text-white text-2xl">{feature.icon}</span>
+                  </div>
+                  <h3 className="text-title text-xl text-center">{feature.title}</h3>
+                  <p className="text-body text-center leading-relaxed">
+                    {feature.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -200,14 +224,20 @@ export default function HomePage() {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 rounded-r-lg p-4 shadow-sm">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <span className="text-red-400 text-xl">⚠️</span>
+        <div className="card-elevated bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-400 p-6 animate-slide-up">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-red-100 rounded-brand flex items-center justify-center flex-shrink-0">
+              <span className="text-red-500 text-xl">⚠️</span>
             </div>
-            <div className="ml-3">
-              <p className="text-red-800 font-medium">Terjadi Kesalahan</p>
-              <p className="text-red-700 text-sm mt-1">{error}</p>
+            <div className="flex-1">
+              <h4 className="text-title text-red-800 text-lg mb-2">Terjadi Kesalahan</h4>
+              <p className="text-body text-red-700">{error}</p>
+              <button
+                onClick={() => setError(null)}
+                className="mt-3 text-sm text-red-600 hover:text-red-800 font-medium underline"
+              >
+                Tutup pesan ini
+              </button>
             </div>
           </div>
         </div>

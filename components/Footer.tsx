@@ -38,33 +38,67 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="bg-gray-50 border-t border-gray-100 mt-16">
-      <div className="container mx-auto px-4 py-8">
+    <footer className="bg-gradient-to-br from-primary-blue/5 to-primary-orange/5 border-t border-primary-orange/20 mt-20 pattern-sakura">
+      <div className="container-brand section-padding">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           {/* Company Info */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-neutral-dark">{footerContent.company_name}</h3>
-            <p className="text-sm text-neutral-gray">{footerContent.description}</p>
-            <div className="space-y-2 text-sm text-neutral-gray">
-              {footerContent.address && <p>📍 {footerContent.address}</p>}
-              {footerContent.email && <p>✉️ {footerContent.email}</p>}
-              {footerContent.phone && <p>📞 {footerContent.phone}</p>}
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h3 className="text-title text-2xl text-brand-gradient">{footerContent.company_name}</h3>
+              <div className="w-16 h-1 bg-gradient-to-r from-primary-orange to-primary-blue rounded-full"></div>
+            </div>
+            <p className="text-body leading-relaxed">{footerContent.description}</p>
+            <div className="space-y-3">
+              {footerContent.address && (
+                <div className="flex items-center gap-3 text-body">
+                  <div className="w-8 h-8 bg-primary-orange/10 rounded-brand flex items-center justify-center">
+                    <span className="text-primary-orange">📍</span>
+                  </div>
+                  {footerContent.address}
+                </div>
+              )}
+              {footerContent.email && (
+                <div className="flex items-center gap-3 text-body">
+                  <div className="w-8 h-8 bg-primary-blue/10 rounded-brand flex items-center justify-center">
+                    <span className="text-primary-blue">✉️</span>
+                  </div>
+                  <a href={`mailto:${footerContent.email}`} className="hover:text-primary-orange transition-colors">
+                    {footerContent.email}
+                  </a>
+                </div>
+              )}
+              {footerContent.phone && (
+                <div className="flex items-center gap-3 text-body">
+                  <div className="w-8 h-8 bg-primary-orange/10 rounded-brand flex items-center justify-center">
+                    <span className="text-primary-orange">📞</span>
+                  </div>
+                  <a href={`tel:${footerContent.phone}`} className="hover:text-primary-blue transition-colors">
+                    {footerContent.phone}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Social Links */}
-          <div className="space-y-4">
-            <h4 className="text-md font-medium text-neutral-dark">Ikuti Kami</h4>
-            <div className="flex flex-col space-y-2">
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h4 className="text-title text-xl">Ikuti Kami</h4>
+              <div className="w-12 h-1 bg-gradient-to-r from-primary-blue to-primary-orange rounded-full"></div>
+            </div>
+            <div className="flex flex-col space-y-4">
               {footerContent.social_instagram && (
                 <a 
                   href={footerContent.social_instagram} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-sm text-neutral-gray hover:text-primary-orange transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-brand hover:bg-white/50 transition-all duration-300 group"
                 >
-                  📷 Instagram
+                  <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-orange-500 rounded-brand flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span className="text-white">📷</span>
+                  </div>
+                  <span className="text-body group-hover:text-primary-orange transition-colors">Instagram</span>
                 </a>
               )}
               {footerContent.social_tiktok && (
@@ -72,9 +106,12 @@ export default function Footer() {
                   href={footerContent.social_tiktok} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-sm text-neutral-gray hover:text-primary-orange transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-brand hover:bg-white/50 transition-all duration-300 group"
                 >
-                  🎵 TikTok
+                  <div className="w-10 h-10 bg-gradient-to-r from-black to-red-500 rounded-brand flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span className="text-white">🎵</span>
+                  </div>
+                  <span className="text-body group-hover:text-primary-blue transition-colors">TikTok</span>
                 </a>
               )}
               {footerContent.social_facebook && (
@@ -82,29 +119,58 @@ export default function Footer() {
                   href={footerContent.social_facebook} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-sm text-neutral-gray hover:text-primary-orange transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-brand hover:bg-white/50 transition-all duration-300 group"
                 >
-                  👥 Facebook
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded-brand flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span className="text-white">👥</span>
+                  </div>
+                  <span className="text-body group-hover:text-primary-orange transition-colors">Facebook</span>
                 </a>
               )}
             </div>
           </div>
 
           {/* Status */}
-          <div className="space-y-4">
-            <h4 className="text-md font-medium text-neutral-dark">Status Sistem</h4>
-            <div className="flex items-center gap-4">
-              <StatusIndicator />
-              <span className="text-sm text-neutral-gray">Semua sistem normal</span>
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h4 className="text-title text-xl">Status Sistem</h4>
+              <div className="w-12 h-1 bg-gradient-to-r from-primary-orange to-primary-blue rounded-full"></div>
+            </div>
+            <div className="card p-6 bg-white/70 backdrop-blur-sm border border-primary-orange/20">
+              <div className="flex items-center gap-4 mb-4">
+                <StatusIndicator />
+                <span className="text-body font-medium">Semua sistem normal</span>
+              </div>
+              <div className="space-y-2 text-caption">
+                <div className="flex justify-between">
+                  <span>Server Status:</span>
+                  <span className="text-green-600 font-medium">Online</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>AI Processing:</span>
+                  <span className="text-green-600 font-medium">Ready</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Response Time:</span>
+                  <span className="text-primary-orange font-medium">&lt; 2s</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-6 border-t border-gray-200 text-center">
-          <p className="text-sm text-neutral-gray">
-            {footerContent.copyright}
-          </p>
+        <div className="pt-8 border-t border-primary-blue/20">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-caption text-center md:text-left">
+              {footerContent.copyright}
+            </p>
+            <div className="flex items-center gap-4 text-caption">
+              <span>Made with</span>
+              <span className="text-primary-orange text-lg">❤️</span>
+              <span>for Indonesian F&B</span>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

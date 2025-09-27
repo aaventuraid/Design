@@ -3,7 +3,7 @@
 import AdminLayout from '@/components/AdminLayout';
 import { PageHeader, Card, Button, LoadingSpinner } from '@/components/admin/AdminComponents';
 import { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
+import { showToast } from '@/lib/toast';
 import { formatDate, formatFileSize } from '@/lib/utils';
 
 interface MediaFile {
@@ -71,7 +71,7 @@ export default function MediaManagementPage() {
       
       setFiles(mockFiles);
     } catch (error) {
-      toast.error('Error fetching media files');
+      showToast('Error fetching media files', 'error');
       console.error('Error:', error);
     } finally {
       setLoading(false);
@@ -100,17 +100,17 @@ export default function MediaManagementPage() {
       const successCount = results.filter(r => r.success).length;
       
       if (successCount > 0) {
-        toast.success(`${successCount} file(s) uploaded successfully`);
+        showToast(`${successCount} file(s) uploaded successfully`, 'success');
         fetchFiles(); // Refresh file list
       }
       
       const failCount = results.length - successCount;
       if (failCount > 0) {
-        toast.error(`${failCount} file(s) failed to upload`);
+        showToast(`${failCount} file(s) failed to upload`, 'error');
       }
       
     } catch (error) {
-      toast.error('Error uploading files');
+      showToast('Error uploading files', 'error');
       console.error('Error:', error);
     } finally {
       setUploading(false);
@@ -129,9 +129,9 @@ export default function MediaManagementPage() {
       
       setFiles(prev => prev.filter(file => !fileIds.includes(file.id)));
       setSelectedFiles([]);
-      toast.success(`${fileIds.length} file(s) deleted successfully`);
+      showToast(`${fileIds.length} file(s) deleted successfully`, 'success');
     } catch (error) {
-      toast.error('Error deleting files');
+      showToast('Error deleting files', 'error');
       console.error('Error:', error);
     }
   };
