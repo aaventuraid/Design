@@ -13,6 +13,38 @@ body {
   @apply bg-white text-neutral-dark;
 }
 
+/* Dark mode (respects class .dark on html) */
+.dark body {
+  @apply bg-neutral-dark text-white;
+}
+
+.dark .card, .dark .bg-white { @apply bg-neutral-dark/40 backdrop-blur; }
+.dark .text-neutral-dark { @apply text-white; }
+.dark .text-neutral-gray { @apply text-gray-300; }
+.dark .border-gray-200 { @apply border-gray-600; }
+.dark .bg-gray-50 { @apply bg-neutral-800; }
+
+/* Improve default focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid rgb(var(--color-primary-orange) / 0.65);
+  outline-offset: 2px;
+}
+
+/* Container responsive refinement */
+.container {
+  @apply max-w-7xl;
+}
+
+/* Reduce motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .btn {
   @apply rounded-xl px-4 py-2 font-semibold transition-colors;
 }

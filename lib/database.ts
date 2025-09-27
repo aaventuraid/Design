@@ -1,9 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import type { User, Session } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
 
 declare global {
+  // Use let so ESLint no-var rule passes; global augmentation is fine.
+  // eslint-disable-next-line no-var
   var __prisma: PrismaClient | undefined;
 }
 
@@ -24,7 +27,13 @@ export class DatabaseService {
     role?: 'ADMIN' | 'USER' | 'PREMIUM';
     preferences?: any;
   }): Promise<User> {
-    const passwordHash = await bcrypt.hash(data.password, 12);
+    const bcryptRounds = (() => {
+      const envRounds = parseInt(process.env.BCRYPT_ROUNDS || '', 10);
+      if (!Number.isNaN(envRounds) && envRounds >= 4 && envRounds <= 15) return envRounds;
+      if (process.env.NODE_ENV === 'test') return 6; // faster in tests
+      return 12;
+    })();
+    const passwordHash = await bcrypt.hash(data.password, bcryptRounds);
 
     return prisma.user.create({
       data: {
@@ -61,7 +70,8 @@ export class DatabaseService {
   }
 
   static async createSession(userId: string): Promise<Session> {
-    const token = jwt.sign({ userId }, process.env.JWT_SECRET || 'fallback-secret', {
+    // Include a random jti so that rapid successive sessions always yield different JWTs
+    const token = jwt.sign({ userId, jti: randomUUID() }, process.env.JWT_SECRET || 'fallback-secret', {
       expiresIn: '7d',
     });
 
@@ -102,6 +112,19 @@ export class DatabaseService {
         where: { token },
       })
       .catch(() => {}); // Ignore if not found
+  }
+
+  static async deleteAllSessionsForUser(userId: string): Promise<number> {
+    const res = await prisma.session.deleteMany({ where: { userId } });
+    return res.count;
+  }
+
+  static async rotateSession(oldToken: string): Promise<{ newToken: string; expiresAt: Date } | null> {
+    const session = await prisma.session.findUnique({ where: { token: oldToken } });
+    if (!session) return null;
+    await prisma.session.delete({ where: { token: oldToken } }).catch(() => {});
+    const newSession = await this.createSession(session.userId);
+    return { newToken: newSession.token, expiresAt: newSession.expiresAt };
   }
 
   // Usage tracking dan rate limiting

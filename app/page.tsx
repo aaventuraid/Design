@@ -383,6 +383,8 @@ export default function HomePage() {
                   <img
                     src={r.url}
                     alt={cfg.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-auto object-contain max-h-64"
                   />
                   <div className="mt-2 text-xs text-neutral-gray">

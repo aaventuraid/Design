@@ -85,6 +85,7 @@ export type AppSettings = {
   defaultMarketplace?: 'gofood' | 'grabfood' | 'shopeefood' | 'instagram';
   brandingEnabled?: boolean;
   watermarkEnabled?: boolean;
+  watermarkText?: string;
 
   // UI/UX Settings
   theme?: 'light' | 'dark' | 'auto';
@@ -96,6 +97,9 @@ export type AppSettings = {
 
   // Rate Limiting
   rateLimit?: number; // requests per hour
+  
+  // Monitoring
+  sentryDsn?: string;
 
   // Brand Assets
   logoUrl?: string;
@@ -113,11 +117,13 @@ const defaultSettings: AppSettings = {
   defaultMarketplace: 'gofood',
   brandingEnabled: false,
   watermarkEnabled: false,
+  watermarkText: 'YukiYaki',
   theme: 'light',
   language: 'id',
   analyticsEnabled: true,
   processingHistory: true,
   rateLimit: 100,
+  sentryDsn: undefined,
 };
 
 export async function getSettings(): Promise<AppSettings> {
@@ -136,13 +142,11 @@ export async function getSettings(): Promise<AppSettings> {
       ...fileSettings,
       ...dbSettingsObj, // Database settings take precedence
       // Database-first approach: only fallback to env if database is empty
-      geminiApiKey:
-        dbSettingsObj.geminiApiKey || fileSettings.geminiApiKey || process.env.GEMINI_API_KEY || '',
+      geminiApiKey: dbSettingsObj.geminiApiKey || fileSettings.geminiApiKey || '',
       imageBgProvider:
-        dbSettingsObj.imageBgProvider ||
-        fileSettings.imageBgProvider ||
-        (process.env.IMAGE_BG_PROVIDER as any) ||
-        defaultSettings.imageBgProvider,
+        dbSettingsObj.imageBgProvider || fileSettings.imageBgProvider || defaultSettings.imageBgProvider,
+      sentryDsn: dbSettingsObj.sentryDsn || fileSettings.sentryDsn || undefined,
+      watermarkText: dbSettingsObj.watermarkText || fileSettings.watermarkText || defaultSettings.watermarkText,
     };
   } catch {
     // Fallback to file-only settings if database is not available
@@ -153,15 +157,18 @@ export async function getSettings(): Promise<AppSettings> {
       return {
         ...defaultSettings,
         ...json,
-        geminiApiKey: json.geminiApiKey || process.env.GEMINI_API_KEY || '',
-        imageBgProvider:
-          json.imageBgProvider || (process.env.IMAGE_BG_PROVIDER as any) || 'internal',
+        geminiApiKey: json.geminiApiKey || '',
+        imageBgProvider: json.imageBgProvider || 'internal',
+        sentryDsn: undefined,
+        watermarkText: json.watermarkText || defaultSettings.watermarkText,
       };
     } catch {
       return {
         ...defaultSettings,
-        geminiApiKey: process.env.GEMINI_API_KEY || '',
-        imageBgProvider: (process.env.IMAGE_BG_PROVIDER as any) || 'internal',
+    geminiApiKey: '',
+    imageBgProvider: 'internal',
+    sentryDsn: undefined,
+    watermarkText: defaultSettings.watermarkText,
       };
     }
   }
@@ -173,8 +180,7 @@ export async function saveSettings(next: Partial<AppSettings>): Promise<AppSetti
 
   // Don't persist env-overridden values to file
   const toSave = { ...merged };
-  if (process.env.GEMINI_API_KEY) delete toSave.geminiApiKey;
-  if (process.env.IMAGE_BG_PROVIDER) delete toSave.imageBgProvider;
+  // No env overlays remaining; keep all values in DB / file
   const candidates = getDataDirs().map((d) => path.join(d, 'settings.json'));
   await writeWithFallback(candidates, JSON.stringify(toSave, null, 2));
   return merged;

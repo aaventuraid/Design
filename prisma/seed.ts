@@ -1,9 +1,158 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
+// Prisma client instance
 const prisma = new PrismaClient();
 
-async function main() {
+// Default site content (idempotent)
+const defaultSiteContent = [
+    // Header content
+    {
+      section: 'header',
+      key: 'logo_url',
+      value: '/logo.svg',
+      valueType: 'IMAGE' as const,
+      label: 'Logo URL',
+      description: 'Main website logo',
+      category: 'branding',
+      sortOrder: 1,
+    },
+    {
+      section: 'header',
+      key: 'site_name',
+      value: 'Yuki Yaki Corner',
+      valueType: 'TEXT' as const,
+      label: 'Site Name',
+      description: 'Main website name',
+      category: 'branding',
+      sortOrder: 2,
+    },
+    {
+      section: 'header',
+      key: 'tagline',
+      value: 'AI-Powered Food Content Platform',
+      valueType: 'TEXT' as const,
+      label: 'Tagline',
+      description: 'Website tagline or subtitle',
+      category: 'branding',
+      sortOrder: 3,
+    },
+    // Homepage content
+    {
+      section: 'homepage',
+      key: 'hero_title',
+      value: 'Optimize Your Food Content with AI',
+      valueType: 'TEXT' as const,
+      label: 'Hero Title',
+      description: 'Main hero section title',
+      category: 'content',
+      sortOrder: 1,
+    },
+    {
+      section: 'homepage',
+      key: 'hero_subtitle',
+      value: 'Generate engaging social media content and optimize food images for maximum impact across all platforms.',
+      valueType: 'TEXT' as const,
+      label: 'Hero Subtitle',
+      description: 'Hero section subtitle/description',
+      category: 'content',
+      sortOrder: 2,
+    },
+    {
+      section: 'homepage',
+      key: 'cta_button_text',
+      value: 'Get Started Free',
+      valueType: 'TEXT' as const,
+      label: 'CTA Button Text',
+      description: 'Call-to-action button text',
+      category: 'content',
+      sortOrder: 3,
+    },
+    // Footer content
+    {
+      section: 'footer',
+      key: 'company_name',
+      value: 'Yuki Yaki Corner',
+      valueType: 'TEXT' as const,
+      label: 'Company Name',
+      description: 'Company name in footer',
+      category: 'branding',
+      sortOrder: 1,
+    },
+    {
+      section: 'footer',
+      key: 'copyright_text',
+      value: '© 2025 Yuki Yaki Corner. All rights reserved.',
+      valueType: 'TEXT' as const,
+      label: 'Copyright Text',
+      description: 'Copyright notice',
+      category: 'legal',
+      sortOrder: 2,
+    },
+    {
+      section: 'footer',
+      key: 'contact_email',
+      value: 'hello@yukiyaki.id',
+      valueType: 'TEXT' as const,
+      label: 'Contact Email',
+      description: 'Main contact email address',
+      category: 'contact',
+      sortOrder: 3,
+    },
+    // Settings content
+    {
+      section: 'settings',
+      key: 'maintenance_mode',
+      value: 'false',
+      valueType: 'JSON' as const,
+      label: 'Maintenance Mode',
+      description: 'Enable/disable maintenance mode',
+      category: 'system',
+      sortOrder: 1,
+    },
+    {
+      section: 'settings',
+      key: 'max_file_size',
+      value: '10485760',
+      valueType: 'TEXT' as const,
+      label: 'Max File Size',
+      description: 'Maximum file upload size in bytes (10MB)',
+      category: 'system',
+      sortOrder: 2,
+    },
+  ];
+
+async function seedSiteContent() {
+  for (const contentData of defaultSiteContent) {
+    await prisma.siteContent.upsert({
+      where: { section_key: { section: contentData.section, key: contentData.key } },
+      update: {},
+      create: contentData as any,
+    });
+  }
+  console.log('✅ Default site content ensured');
+}
+
+async function seedSystemSettings() {
+  const defaultSettings = [
+    { key: 'geminiApiKey', value: '', description: 'Gemini API key for AI features - Set this in Admin Panel', category: 'ai' },
+    { key: 'defaultAIProvider', value: 'gemini', description: 'Default AI provider (gemini | local)', category: 'ai' },
+    { key: 'maintenanceMode', value: false, description: 'Enable maintenance mode', category: 'system' },
+    { key: 'maxFileSize', value: 10485760, description: 'Maximum file size for uploads in bytes', category: 'uploads' },
+    { key: 'analyticsEnabled', value: true, description: 'Enable analytics collection', category: 'system' },
+  ];
+
+  for (const setting of defaultSettings) {
+    await prisma.systemSettings.upsert({
+      where: { key: setting.key },
+      update: {},
+      create: { ...setting, value: setting.value as any },
+    });
+  }
+  console.log('✅ System settings ensured');
+}
+
+async function seedAdminUser() {
   console.log('🌱 Seeding database...');
 
   // Create default admin user only if no users exist
@@ -17,7 +166,7 @@ async function main() {
     const defaultPassword = 'admin123';
     const passwordHash = await bcrypt.hash(defaultPassword, 12);
 
-    const admin = await prisma.user.create({
+  const _admin = await prisma.user.create({
       data: {
         email: defaultEmail,
         username: 'admin',
@@ -38,43 +187,8 @@ async function main() {
     console.log(`ℹ️  Database already has ${userCount} user(s), skipping admin creation`);
   }
 
-  // Create some default system settings (admin akan set API key nanti)
-  const defaultSettings = [
-    {
-      key: 'geminiApiKey',
-      value: '', // Will be set by admin through admin panel
-      description: 'Gemini API key for AI features - Set this in Admin Panel',
-      category: 'ai',
-    },
-    {
-      key: 'defaultAIProvider',
-      value: 'gemini',
-      description: 'Default AI provider (gemini | local)',
-      category: 'ai',
-    },
-    {
-      key: 'maintenanceMode',
-      value: false,
-      description: 'Enable maintenance mode',
-      category: 'system',
-    },
-    {
-      key: 'maxFileSize',
-      value: 10485760, // 10MB
-      description: 'Maximum file size for uploads in bytes',
-      category: 'uploads',
-    },
-  ];
-
-  for (const setting of defaultSettings) {
-    await prisma.systemSettings.upsert({
-      where: { key: setting.key },
-      update: {},
-      create: setting,
-    });
-  }
-
-  console.log('✅ System settings initialized');
+  await seedSystemSettings();
+  await seedSiteContent();
 
   // Create sample premium user - only in development
   if (process.env.NODE_ENV === 'development' || process.env.CREATE_DEMO_USER === 'true') {
@@ -211,10 +325,14 @@ async function main() {
     console.log('ℹ️  Skipping demo user and sample data creation in production');
   }
 
-  console.log('🎉 Seeding completed!');
+  console.log('🎉 Admin / demo data seeding completed!');
 }
 
-main()
+async function seedDemoData() {
+  await seedAdminUser();
+}
+
+seedDemoData()
   .catch((e) => {
     console.error('❌ Seeding failed:', e);
     process.exit(1);

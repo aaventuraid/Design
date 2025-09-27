@@ -1,27 +1,41 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { DatabaseService } from '@/lib/database';
+import '@/lib/bootstrap'; // side-effect: initialize monitoring early
+import { jsonError, jsonSuccess, withRoute } from '@/lib/api';
+import { logger } from '@/lib/logger';
+import { generateRequestId } from '@/lib/utils';
+import { captureError } from '@/lib/monitoring';
+import { Metrics } from '@/lib/metrics';
 
 // Explicitly mark this route as dynamic
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
-  try {
-    const { email, password } = await request.json();
-
-    if (!email || !password) {
-      return NextResponse.json({ error: 'Email dan password diperlukan' }, { status: 400 });
+  const reqId = generateRequestId();
+  logger.info('auth.login:start', { reqId });
+  return withRoute(async () => {
+    const body = await request.json().catch(() => null);
+    if (!body?.email || !body?.password) {
+      Metrics.authLogin(400);
+      return jsonError('Email dan password diperlukan', 400);
     }
 
-    const user = await DatabaseService.authenticateUser(email, password);
-
+    let user;
+    try {
+      user = await DatabaseService.authenticateUser(body.email, body.password);
+    } catch (e: any) {
+      captureError(e, { reqId, stage: 'authenticateUser' });
+      throw e;
+    }
     if (!user) {
-      return NextResponse.json({ error: 'Email atau password salah' }, { status: 401 });
+      logger.warn('auth.login:invalid_credentials', { reqId, email: body.email });
+      Metrics.authLogin(401);
+      return jsonError('Email atau password salah', 401);
     }
 
     const session = await DatabaseService.createSession(user.id);
 
-    // Log audit
     await DatabaseService.logAudit({
       userId: user.id,
       action: 'LOGIN',
@@ -30,7 +44,9 @@ export async function POST(request: NextRequest) {
       userAgent: request.headers.get('user-agent') || 'unknown',
     });
 
-    return NextResponse.json({
+    logger.info('auth.login:success', { reqId, userId: user.id });
+    Metrics.authLogin(200);
+    return jsonSuccess({
       token: session.token,
       user: {
         id: user.id,
@@ -39,9 +55,7 @@ export async function POST(request: NextRequest) {
         role: user.role,
       },
       expiresAt: session.expiresAt,
+      reqId,
     });
-  } catch (error) {
-    console.error('Login error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+  });
 }

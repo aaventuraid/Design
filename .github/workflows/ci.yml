@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" \
+          --health-interval 5s \
+          --health-timeout 5s \
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint -- --no-cache || npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
+          JWT_SECRET: test-secret
+
+      - name: DB migrate
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
+
+      - name: DB seed (optional)
+        run: npm run db:seed || echo "Seed skipped"
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
+          JWT_SECRET: test-secret
+
+      - name: Tests (unit + routes)
+        run: npm run test:coverage
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
+          JWT_SECRET: test-secret
+
+      # Optional: Run smoke test (requires running server). Kept commented until integration env ready.
+      # - name: Start server
+      #   run: npm start &
+      # - name: Wait for server
+      #   run: npx wait-on http://localhost:3000
+      # - name: Smoke Test
+      #   run: npm run smoke

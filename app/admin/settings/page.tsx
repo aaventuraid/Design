@@ -100,61 +100,21 @@ export default function SettingsPage() {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      // Simulasi API call - replace dengan actual API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const token = localStorage.getItem('auth-token');
+      const response = await fetch('/api/admin/settings', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
       
-      // Mock data - replace dengan actual API response
-      const mockSettings: Settings = {
-        general: {
-          siteName: 'My Website',
-          siteDescription: 'A powerful business website built with Next.js',
-          adminEmail: 'admin@example.com',
-          timezone: 'Asia/Jakarta',
-          language: 'id',
-          maintenance: false,
-        },
-        seo: {
-          metaTitle: 'My Website - Professional Business Solutions',
-          metaDescription: 'We provide professional business solutions with cutting-edge technology',
-          keywords: 'business, technology, solutions, professional',
-          googleAnalytics: 'G-XXXXXXXXXX',
-          googleSearchConsole: '',
-          facebookPixel: '',
-        },
-        email: {
-          smtpHost: 'smtp.gmail.com',
-          smtpPort: '587',
-          smtpUsername: '',
-          smtpPassword: '',
-          fromEmail: 'noreply@example.com',
-          fromName: 'My Website',
-          encryption: 'tls',
-        },
-        security: {
-          passwordMinLength: 8,
-          requireSpecialChars: true,
-          sessionTimeout: 30,
-          maxLoginAttempts: 5,
-          enableTwoFactor: false,
-          allowRegistration: true,
-        },
-        api: {
-          rateLimit: 100,
-          enableCors: true,
-          corsOrigins: '*',
-          apiKey: 'sk-xxxxxxxxxxxxxxxxxx',
-          webhookUrl: '',
-        },
-        backup: {
-          autoBackup: true,
-          backupFrequency: 'daily',
-          backupRetention: 30,
-          backupLocation: '/backups',
-          lastBackup: '2024-01-15T10:30:00Z',
-        },
-      };
-      
-      setSettings(mockSettings);
+      if (data.success) {
+        setSettings(data.data);
+      } else {
+        toast.error(data.error || 'Failed to fetch settings');
+      }
     } catch (error) {
       toast.error('Error fetching settings');
       console.error('Error:', error);
@@ -170,10 +130,26 @@ export default function SettingsPage() {
     setSaving(section);
     
     try {
-      // Simulasi API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const token = localStorage.getItem('auth-token');
+      const response = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          section,
+          settings: settings[section]
+        })
+      });
+
+      const data = await response.json();
       
-      toast.success(`${section.charAt(0).toUpperCase() + section.slice(1)} settings saved successfully`);
+      if (data.success) {
+        toast.success(data.message || `${section.charAt(0).toUpperCase() + section.slice(1)} settings saved successfully`);
+      } else {
+        toast.error(data.error || 'Failed to save settings');
+      }
     } catch (error) {
       toast.error('Error saving settings');
       console.error('Error:', error);
@@ -196,10 +172,30 @@ export default function SettingsPage() {
   };
 
   // Generate new API key
-  const generateApiKey = () => {
-    const newKey = 'sk-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    updateSettings('api', 'apiKey', newKey);
-    toast.success('New API key generated');
+  const generateApiKey = async () => {
+    try {
+      const token = localStorage.getItem('auth-token');
+      const response = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ action: 'generateApiKey' })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        updateSettings('api', 'apiKey', data.data.apiKey);
+        toast.success(data.message || 'New API key generated');
+      } else {
+        toast.error(data.error || 'Failed to generate API key');
+      }
+    } catch (error) {
+      toast.error('Error generating API key');
+      console.error('Error:', error);
+    }
   };
 
   // Manual backup

@@ -21,7 +21,7 @@ export default function ImagePreview({
   const mimeLabel = isPng ? 'PNG' : 'JPEG';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" aria-live={loading ? 'polite' : 'off'} aria-busy={loading}>
       {/* Preview Header */}
       <div className="text-center space-y-2">
         <h3 className="text-2xl font-bold text-neutral-dark">Hasil Pemrosesan</h3>
@@ -36,7 +36,7 @@ export default function ImagePreview({
         )}
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
+  <div className="grid md:grid-cols-2 gap-6" role="group" aria-label="Perbandingan gambar sebelum dan sesudah">
         {/* Original Image */}
         <div className="group">
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow">
@@ -48,13 +48,16 @@ export default function ImagePreview({
             </div>
 
             {original ? (
-              <div className="bg-gray-50 rounded-xl overflow-hidden border">
+              <div className="bg-gray-50 rounded-xl overflow-hidden border relative">
                 { }
                 <img
                   src={original}
                   alt="Foto asli"
-                  className="w-full h-auto object-contain max-h-80"
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-auto object-contain max-h-80 md:max-h-[420px]"
                 />
+                <span className="sr-only">Gambar asli sebelum diproses</span>
               </div>
             ) : (
               <div className="bg-gray-50 rounded-xl p-12 text-center border-2 border-dashed border-gray-300">
@@ -113,16 +116,19 @@ export default function ImagePreview({
                   <img
                     src={processed}
                     alt="Hasil proses"
-                    className="relative w-full h-auto object-contain max-h-80"
+                    loading="lazy"
+                    decoding="async"
+                    className="relative w-full h-auto object-contain max-h-80 md:max-h-[420px]"
                   />
+                  <span className="sr-only">Gambar hasil setelah diproses</span>
                 </div>
 
                 {/* Download Actions */}
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <a
                     href={processed}
                     download={`yuki-yaki-${currentPreset}-${Date.now()}.${fileExt}`}
-                    className="flex-1 bg-gradient-to-r from-primary-orange to-primary-blue text-white py-3 px-4 rounded-xl font-semibold text-center hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
+                    className="flex-1 bg-gradient-to-r from-primary-orange to-primary-blue text-white py-3 px-4 rounded-xl font-semibold text-center hover:shadow-lg transition-all duration-200 hover:scale-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-orange/50"
                   >
                     <div className="flex items-center justify-center gap-2">
                       <span>📥</span>
@@ -139,7 +145,7 @@ export default function ImagePreview({
                       document.body.appendChild(toast);
                       setTimeout(() => toast.remove(), 2000);
                     }}
-                    className="px-4 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                    className="px-4 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-orange/40"
                     title="Salin URL gambar"
                   >
                     <span className="text-xl">📋</span>

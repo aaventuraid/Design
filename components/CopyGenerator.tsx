@@ -52,11 +52,13 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
   };
 
   return (
-    <div className="border border-gray-200 rounded-2xl bg-white shadow-sm overflow-hidden">
+    <div className="border border-gray-200 rounded-2xl bg-white shadow-sm overflow-hidden" aria-live={loading ? 'polite' : 'off'}>
       <div className="p-6 border-b border-gray-100">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center justify-between w-full text-left hover:opacity-80 transition-opacity"
+          aria-expanded={expanded}
+          aria-controls="copy-generator-panel"
+          className="flex items-center justify-between w-full text-left hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-orange/40 rounded-lg"
         >
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gradient-to-r from-primary-orange to-primary-blue rounded-xl flex items-center justify-center">
@@ -90,7 +92,7 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
       </div>
 
       {expanded && (
-        <div className="p-6 space-y-6">
+        <div id="copy-generator-panel" className="p-6 space-y-6" role="region" aria-label="Form generator copy AI">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-neutral-dark mb-2">
@@ -100,7 +102,7 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
                 type="text"
                 value={options.productName}
                 onChange={(e) => setOptions({ ...options, productName: e.target.value })}
-                className="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-primary-orange/20 focus:border-primary-orange transition-colors"
+                className="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-primary-orange/30 focus:border-primary-orange transition-colors"
                 placeholder="Contoh: Beef Yakiniku Premium"
               />
             </div>
@@ -110,7 +112,7 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
               <select
                 value={options.category}
                 onChange={(e) => setOptions({ ...options, category: e.target.value })}
-                className="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-primary-orange/20 focus:border-primary-orange transition-colors"
+                className="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-primary-orange/30 focus:border-primary-orange transition-colors"
               >
                 <option value="yakiniku">Yakiniku</option>
                 <option value="rice_bowl">Rice Bowl</option>
@@ -129,7 +131,7 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
               <select
                 value={options.tone}
                 onChange={(e) => setOptions({ ...options, tone: e.target.value as any })}
-                className="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-primary-orange/20 focus:border-primary-orange transition-colors"
+                className="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-primary-orange/30 focus:border-primary-orange transition-colors"
               >
                 <option value="casual">Santai</option>
                 <option value="professional">Profesional</option>
@@ -145,7 +147,7 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
               <select
                 value={options.platform}
                 onChange={(e) => setOptions({ ...options, platform: e.target.value as any })}
-                className="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-primary-orange/20 focus:border-primary-orange transition-colors"
+                className="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-primary-orange/30 focus:border-primary-orange transition-colors"
               >
                 <option value="gofood">GoFood</option>
                 <option value="grabfood">GrabFood</option>
@@ -160,7 +162,7 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
               <select
                 value={options.language}
                 onChange={(e) => setOptions({ ...options, language: e.target.value as any })}
-                className="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-primary-orange/20 focus:border-primary-orange transition-colors"
+                className="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-primary-orange/30 focus:border-primary-orange transition-colors"
               >
                 <option value="id">Indonesia</option>
                 <option value="en">Inggris</option>
@@ -174,12 +176,12 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
               <label className="block text-sm font-semibold text-neutral-dark mb-2">
                 Mode Banana (Eksperimen)
               </label>
-              <label className="flex items-center gap-3 p-3 border border-dashed border-gray-200 rounded-xl bg-gray-50 cursor-pointer">
+              <label className="flex items-center gap-3 p-3 border border-dashed border-gray-200 rounded-xl bg-gray-50 cursor-pointer focus-within:ring-2 focus-within:ring-primary-orange/20">
                 <input
                   type="checkbox"
                   checked={Boolean(options.bananaMode)}
                   onChange={(e) => setOptions({ ...options, bananaMode: e.target.checked })}
-                  className="accent-primary-orange scale-110"
+                  className="accent-primary-orange scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-orange/40"
                 />
                 <span className="text-sm text-neutral-gray">
                   Gaya bahasa ekstra catchy dan dinamis sesuai fitur baru Gemini.
@@ -195,7 +197,7 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
               className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-200 ${
                 loading || !options.productName.trim()
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-primary-orange to-primary-blue text-white hover:shadow-lg hover:scale-[1.02]'
+                  : 'bg-gradient-to-r from-primary-orange to-primary-blue text-white hover:shadow-lg hover:scale-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-orange/50'
               }`}
             >
               {loading ? (
@@ -227,9 +229,9 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
                     <label className="text-xs font-semibold text-orange-700 uppercase tracking-wider">
                       📝 Judul Produk
                     </label>
-                    <button
+                      <button
                       onClick={() => copyToClipboard(copy.title)}
-                      className="px-3 py-1 bg-orange-200 hover:bg-orange-300 text-orange-700 text-xs rounded-lg transition-colors font-medium"
+                        className="px-3 py-1 bg-orange-200 hover:bg-orange-300 text-orange-700 text-xs rounded-lg transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/50"
                     >
                       Salin
                     </button>
@@ -244,9 +246,9 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
                     <label className="text-xs font-semibold text-blue-700 uppercase tracking-wider">
                       📋 Deskripsi Produk
                     </label>
-                    <button
+                      <button
                       onClick={() => copyToClipboard(copy.description)}
-                      className="px-3 py-1 bg-blue-200 hover:bg-blue-300 text-blue-700 text-xs rounded-lg transition-colors font-medium"
+                        className="px-3 py-1 bg-blue-200 hover:bg-blue-300 text-blue-700 text-xs rounded-lg transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50"
                     >
                       Salin
                     </button>
@@ -262,7 +264,7 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
                       </label>
                       <button
                         onClick={() => copyToClipboard(copy.hashtags?.join(' ') || '')}
-                        className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs rounded-lg transition-colors font-medium"
+                        className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs rounded-lg transition-colors font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-orange/40"
                       >
                         Salin
                       </button>
@@ -297,7 +299,7 @@ export default function CopyGenerator({ onGenerate }: CopyGeneratorProps) {
                       const allCopy = `${copy.title}\n\n${copy.description}\n\n${copy.hashtags?.join(' ') || ''}\n\n${copy.callToAction}${copy.brandMessage ? `\n\n${copy.brandMessage}` : ''}`;
                       copyToClipboard(allCopy);
                     }}
-                    className="w-full py-2 bg-gradient-to-r from-primary-orange to-primary-blue text-white rounded-lg hover:shadow-md transition-all duration-200 font-medium"
+                    className="w-full py-2 bg-gradient-to-r from-primary-orange to-primary-blue text-white rounded-lg hover:shadow-md transition-all duration-200 font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-orange/50"
                   >
                     📋 Salin Semua Copy
                   </button>

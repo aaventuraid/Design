@@ -67,7 +67,7 @@ export default function UploadDropzone({
   }, [loading]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" aria-label="Area unggah foto dan pengaturan proses">
       {/* Upload Area */}
       <div
         className={`relative border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-300 ${
@@ -75,7 +75,7 @@ export default function UploadDropzone({
             ? 'border-primary-orange bg-primary-orange/5 scale-[1.02] shadow-lg'
             : loading
               ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
-              : 'border-primary-blue/30 hover:bg-gradient-to-br hover:from-primary-blue/5 hover:to-primary-orange/5 hover:border-primary-orange/50 hover:shadow-md'
+              : 'border-primary-blue/30 hover:bg-gradient-to-br hover:from-primary-blue/5 hover:to-primary-orange/5 hover:border-primary-orange/50 hover:shadow-md focus-within:ring-2 focus-within:ring-primary-orange/30'
         }`}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -100,7 +100,7 @@ export default function UploadDropzone({
           disabled={loading}
         />
 
-        <div className="space-y-6">
+  <div className="space-y-6 max-w-2xl mx-auto">
           <div className="flex justify-center">
             <div className="w-20 h-20 bg-gradient-to-r from-primary-orange to-primary-blue rounded-2xl flex items-center justify-center">
               <span className="text-white text-3xl">📸</span>
@@ -122,7 +122,8 @@ export default function UploadDropzone({
             <div className="space-y-4">
               <button
                 type="button"
-                className="bg-gradient-to-r from-primary-orange to-primary-blue text-white font-semibold px-8 py-3 rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-105"
+                aria-label="Pilih foto dari perangkat"
+                className="bg-gradient-to-r from-primary-orange to-primary-blue text-white font-semibold px-8 py-3 rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-[1.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-orange/50"
                 disabled={loading}
               >
                 Pilih Foto
@@ -161,7 +162,7 @@ export default function UploadDropzone({
             <select
               value={preset}
               onChange={(e) => setPreset(e.target.value as MarketplacePreset)}
-              className="w-full border border-gray-200 rounded-xl p-3 bg-white focus:ring-2 focus:ring-primary-orange/20 focus:border-primary-orange transition-colors"
+              className="w-full border border-gray-200 rounded-xl p-3 bg-white focus:ring-2 focus:ring-primary-orange/30 focus:border-primary-orange transition-colors"
             >
               {presetOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -184,7 +185,7 @@ export default function UploadDropzone({
               max={60}
               value={tolerance}
               onChange={(e) => setTolerance(parseInt(e.target.value))}
-              className="w-full accent-primary-orange h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              className="w-full accent-primary-orange h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-orange/30"
             />
             <div className="flex justify-between text-xs text-neutral-gray mt-2">
               <span>Ketat (0)</span>
@@ -199,12 +200,12 @@ export default function UploadDropzone({
           </div>
 
           <div>
-            <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-gray-50 transition-colors">
+            <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-gray-50 transition-colors focus-within:ring-2 focus-within:ring-primary-orange/20">
               <input
                 type="checkbox"
                 checked={branding}
                 onChange={(e) => setBranding(e.target.checked)}
-                className="w-5 h-5 accent-primary-orange rounded"
+                className="w-5 h-5 accent-primary-orange rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-orange/40"
               />
               <div className="flex-1">
                 <span className="text-sm font-medium text-neutral-dark">Tambahkan Branding</span>

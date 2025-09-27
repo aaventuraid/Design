@@ -1,6 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/database';
 import { z } from 'zod';
+import jwt from 'jsonwebtoken';
+
+// Authentication middleware
+async function authenticateAdmin(request: NextRequest) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+
+  const token = authHeader.substring(7);
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId }
+    });
+    
+    if (!user || user.role !== 'ADMIN') {
+      return null;
+    }
+    
+    return user;
+  } catch {
+    return null;
+  }
+}
 
 // Schema untuk validasi input
 const SiteContentSchema = z.object({
@@ -23,6 +48,12 @@ const UpdateContentSchema = z.object({
 // GET - Ambil semua content atau berdasarkan section
 export async function GET(request: NextRequest) {
   try {
+    // Check authentication
+    const user = await authenticateAdmin(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const section = searchParams.get('section');
     const category = searchParams.get('category');
@@ -57,6 +88,12 @@ export async function GET(request: NextRequest) {
 // POST - Buat content baru
 export async function POST(request: NextRequest) {
   try {
+    // Check authentication
+    const user = await authenticateAdmin(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const validatedData = SiteContentSchema.parse(body);
 
@@ -88,6 +125,12 @@ export async function POST(request: NextRequest) {
 // PUT - Update content berdasarkan section dan key
 export async function PUT(request: NextRequest) {
   try {
+    // Check authentication
+    const user = await authenticateAdmin(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const section = searchParams.get('section');
     const key = searchParams.get('key');
@@ -136,6 +179,12 @@ export async function PUT(request: NextRequest) {
 // DELETE - Hapus content
 export async function DELETE(request: NextRequest) {
   try {
+    // Check authentication
+    const user = await authenticateAdmin(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const section = searchParams.get('section');
     const key = searchParams.get('key');

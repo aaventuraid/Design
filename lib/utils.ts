@@ -125,6 +125,15 @@ export function generateId(): string {
 }
 
 /**
+ * Generate a short request correlation ID (base36 timestamp + random)
+ */
+export function generateRequestId(): string {
+  const ts = Date.now().toString(36);
+  const rnd = Math.random().toString(36).slice(2, 8);
+  return `${ts}-${rnd}`;
+}
+
+/**
  * Debounce function
  */
 export function debounce<T extends (...args: any[]) => any>(
@@ -161,17 +170,26 @@ export function sanitizeHtml(html: string): string {
 /**
  * Extract Bearer token from Authorization header
  */
-export function extractBearerToken(request: Request): string | null {
+// Unified token extraction to avoid duplication
+function getAuthHeaderToken(request: Request): string | null {
   const authHeader = request.headers.get('authorization');
-  return authHeader?.replace('Bearer ', '') || null;
+  if (!authHeader) return null;
+  // Support already bare token or Bearer prefixed
+  return authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
 }
 
 /**
- * Extract token from Authorization header with Bearer prefix check
+ * Extract Bearer token (legacy name kept for backward compatibility)
+ */
+export function extractBearerToken(request: Request): string | null {
+  return getAuthHeaderToken(request);
+}
+
+/**
+ * Extract auth token (preferred) - delegates to unified implementation
  */
 export function extractAuthToken(request: Request): string | null {
-  const authHeader = request.headers.get('authorization');
-  return authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  return getAuthHeaderToken(request);
 }
 
 /**

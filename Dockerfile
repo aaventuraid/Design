@@ -12,6 +12,12 @@ RUN apk add --no-cache \
     netcat-openbsd \
     && rm -rf /var/cache/apk/*
 
+# Configure npm network retries/timeouts (helps flaky networks during CI/build)
+ENV NPM_CONFIG_FETCH_RETRIES=5 \
+    NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=20000 \
+    NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=60000 \
+    NPM_CONFIG_FETCH_TIMEOUT=120000
+
 # Set timezone
 RUN apk add --no-cache tzdata
 ENV TZ=Asia/Jakarta
@@ -29,8 +35,12 @@ COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 
 # Install production dependencies with retry mechanism
-RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund && \
-    npm cache clean --force
+RUN set -eux; \
+        for i in 1 2 3; do \
+            npm ci --omit=dev --ignore-scripts --no-audit --no-fund && break || sleep 5; \
+            echo "npm ci attempt $i failed, retrying..."; \
+        done; \
+        npm cache clean --force || true
 
 # Install additional dependencies required by Prisma at runtime
 RUN npm install perfect-debounce c12 --no-save
@@ -53,8 +63,11 @@ COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 
 # Install with retry mechanism and proper error handling
-RUN npm ci --no-audit --no-fund --prefer-offline --omit=optional || \
-    (npm cache clean --force && npm ci --no-audit --no-fund)
+RUN set -eux; \
+        for i in 1 2 3; do \
+            npm ci --no-audit --no-fund --prefer-offline --omit=optional && break || sleep 5; \
+            echo "builder npm ci attempt $i failed, retrying..."; \
+        done || (npm cache clean --force && npm ci --no-audit --no-fund)
 
 # Install Sharp for Alpine Linux musl compatibility
 RUN npm install --platform=linux --arch=x64 --libc=musl sharp

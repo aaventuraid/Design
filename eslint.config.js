@@ -1,9 +1,7 @@
 const { FlatCompat } = require('@eslint/eslintrc');
+const compat = new FlatCompat({ baseDirectory: __dirname });
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
+// Extend Next core-web-vitals & typescript configs, then enforce zero-warning policy.
 module.exports = [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
@@ -17,12 +15,12 @@ module.exports = [
   },
   {
     rules: {
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'prefer-const': 'error',
+      'no-var': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-vars': 'warn',
       'react-hooks/exhaustive-deps': 'off',
       '@next/next/no-img-element': 'off',
-      'prefer-const': 'warn',
-      'no-var': 'error',
       '@typescript-eslint/no-require-imports': 'off',
       '@typescript-eslint/triple-slash-reference': 'off'
     }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DatabaseService } from '@/lib/database';
-import { extractBearerToken } from '@/lib/utils';
+import { extractBearerToken, ApiErrors } from '@/lib/utils';
 
 // Middleware untuk autentikasi
 export async function withAuth(
@@ -60,11 +60,7 @@ export async function withRateLimit(
 
     if (!rateLimit.allowed) {
       return NextResponse.json(
-        {
-          error: 'Rate limit exceeded. Coba lagi sebentar.',
-          resetTime: rateLimit.resetTime,
-          remaining: rateLimit.remaining,
-        },
+        { ...ApiErrors.RATE_LIMIT, resetTime: rateLimit.resetTime, remaining: rateLimit.remaining },
         { status: 429 },
       );
     }
