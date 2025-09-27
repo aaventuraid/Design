@@ -6,17 +6,18 @@
     "dev": "next dev",
     "build": "next build --no-lint",
     "start": "next start",
-  "lint": "eslint . --max-warnings=0",
+    "lint": "eslint . --max-warnings=0",
     "db:generate": "prisma generate",
     "db:migrate:prod": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "metrics": "tsx scripts/health-metrics.ts",
     "smoke": "tsx scripts/smoke-test.ts",
-  "pretest": "prisma generate && prisma migrate deploy",
-  "test": "vitest run",
+    "pretest": "prisma generate && prisma migrate deploy",
+    "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-  "test:e2e": "playwright test",
-  "test:all": "vitest run && playwright test"
+    "test:e2e": "playwright test",
+    "test:all": "vitest run && playwright test",
+    "reset:fresh": "tsx scripts/fresh-reset.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
