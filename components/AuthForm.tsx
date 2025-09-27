@@ -37,7 +37,17 @@ export default function AuthForm({ onLogin }: AuthFormProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Terjadi kesalahan');
+        // Map known codes to richer Indonesian messages
+        if (data?.code) {
+          const map: Record<string, string> = {
+            NOT_FOUND: 'Akun tidak ditemukan. Pastikan email benar atau hubungi admin.',
+            INACTIVE: 'Akun Anda nonaktif. Silakan hubungi administrator.',
+            INVALID_PASSWORD: 'Password salah. Periksa kembali atau reset jika lupa.',
+          };
+          setError(map[data.code] || data.error || 'Terjadi kesalahan');
+        } else {
+          setError(data.error || 'Terjadi kesalahan');
+        }
         return;
       }
 

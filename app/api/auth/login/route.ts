@@ -21,18 +21,32 @@ export async function POST(request: NextRequest) {
       return jsonError('Email dan password diperlukan', 400);
     }
 
-    let user;
+    let authResult;
     try {
-      user = await DatabaseService.authenticateUser(body.email, body.password);
+      authResult = await DatabaseService.authenticateUserDetailed(body.email, body.password);
     } catch (e: any) {
       captureError(e, { reqId, stage: 'authenticateUser' });
       throw e;
     }
-    if (!user) {
-      logger.warn('auth.login:invalid_credentials', { reqId, email: body.email });
+    if (!authResult.success) {
       Metrics.authLogin(401);
-      return jsonError('Email atau password salah', 401);
+      let message = 'Email atau password salah';
+      let code = authResult.reason;
+      switch (authResult.reason) {
+        case 'NOT_FOUND':
+          message = 'Akun tidak ditemukan';
+          break;
+        case 'INACTIVE':
+          message = 'Akun nonaktif. Hubungi admin.';
+          break;
+        case 'INVALID_PASSWORD':
+          message = 'Password salah';
+          break;
+      }
+      logger.warn('auth.login:failed', { reqId, email: body.email, reason: authResult.reason });
+      return jsonError(message, 401, { code });
     }
+    const user = authResult.user;
 
     const session = await DatabaseService.createSession(user.id);
 
@@ -44,7 +58,7 @@ export async function POST(request: NextRequest) {
       userAgent: request.headers.get('user-agent') || 'unknown',
     });
 
-    logger.info('auth.login:success', { reqId, userId: user.id });
+  logger.info('auth.login:success', { reqId, userId: user.id });
     Metrics.authLogin(200);
     return jsonSuccess({
       token: session.token,

@@ -69,6 +69,20 @@ export class DatabaseService {
     return user;
   }
 
+  // Detailed variant: exposes failure reason without leaking password hash
+  static async authenticateUserDetailed(email: string, password: string): Promise<
+    | { success: true; user: User }
+    | { success: false; reason: 'NOT_FOUND' | 'INACTIVE' | 'INVALID_PASSWORD' }
+  > {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return { success: false, reason: 'NOT_FOUND' };
+    if (!user.isActive) return { success: false, reason: 'INACTIVE' };
+    const isValid = await bcrypt.compare(password, user.passwordHash);
+    if (!isValid) return { success: false, reason: 'INVALID_PASSWORD' };
+    await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
+    return { success: true, user };
+  }
+
   static async createSession(userId: string): Promise<Session> {
     // Include a random jti so that rapid successive sessions always yield different JWTs
     const token = jwt.sign({ userId, jti: randomUUID() }, process.env.JWT_SECRET || 'fallback-secret', {
