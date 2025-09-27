@@ -133,58 +133,38 @@ async function seedSiteContent() {
   console.log('✅ Default site content ensured');
 }
 
-async function seedSystemSettings() {
-  const defaultSettings = [
-    { key: 'geminiApiKey', value: '', description: 'Gemini API key for AI features - Set this in Admin Panel', category: 'ai' },
-    { key: 'defaultAIProvider', value: 'gemini', description: 'Default AI provider (gemini | local)', category: 'ai' },
-    { key: 'maintenanceMode', value: false, description: 'Enable maintenance mode', category: 'system' },
-    { key: 'maxFileSize', value: 10485760, description: 'Maximum file size for uploads in bytes', category: 'uploads' },
-    { key: 'analyticsEnabled', value: true, description: 'Enable analytics collection', category: 'system' },
-  ];
+async function ensureAdminUser() {
+  console.log('🌱 Ensuring admin user...');
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@yukiyaki.id';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  const forceReset = (process.env.ADMIN_FORCE_RESET || 'false').toLowerCase() === 'true';
 
-  for (const setting of defaultSettings) {
-    await prisma.systemSettings.upsert({
-      where: { key: setting.key },
-      update: {},
-      create: { ...setting, value: setting.value as any },
-    });
-  }
-  console.log('✅ System settings ensured');
-}
-
-async function seedAdminUser() {
-  console.log('🌱 Seeding database...');
-
-  // Create default admin user only if no users exist
-  const userCount = await prisma.user.count();
-
-  if (userCount === 0) {
-    console.log('🔐 Creating default admin user...');
-
-    // Use default credentials that must be changed after first login
-    const defaultEmail = 'admin@yukiyaki.id';
-    const defaultPassword = 'admin123';
-    const passwordHash = await bcrypt.hash(defaultPassword, 12);
-
-  const _admin = await prisma.user.create({
+  const existing = await prisma.user.findUnique({ where: { email: adminEmail } });
+  if (!existing) {
+    console.log('🔐 Admin missing - creating default admin user');
+    const passwordHash = await bcrypt.hash(adminPassword, 12);
+    await prisma.user.create({
       data: {
-        email: defaultEmail,
+        email: adminEmail,
         username: 'admin',
         passwordHash,
         role: 'ADMIN',
         isActive: true,
-        preferences: {
-          theme: 'light',
-          language: 'id',
-          notifications: true,
-        },
+        preferences: { theme: 'light', language: 'id', notifications: true },
       },
     });
-
-    console.log(`✅ Default admin user created`);
-    console.log(`⚠️  IMPORTANT: Change default credentials after first login!`);
+    console.log('✅ Admin user created');
+    console.log('⚠️  IMPORTANT: Change default credentials after first login!');
+  } else if (forceReset) {
+    console.log('♻️  ADMIN_FORCE_RESET=true -> resetting admin password');
+    const passwordHash = await bcrypt.hash(adminPassword, 12);
+    await prisma.user.update({
+      where: { email: adminEmail },
+      data: { passwordHash, role: 'ADMIN', isActive: true },
+    });
+    console.log('✅ Admin password reset');
   } else {
-    console.log(`ℹ️  Database already has ${userCount} user(s), skipping admin creation`);
+    console.log('ℹ️  Admin user already exists (no reset requested)');
   }
 
   await seedSystemSettings();
@@ -329,7 +309,7 @@ async function seedAdminUser() {
 }
 
 async function seedDemoData() {
-  await seedAdminUser();
+  await ensureAdminUser();
 }
 
 seedDemoData()
