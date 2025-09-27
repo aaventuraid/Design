@@ -15,14 +15,14 @@ export function StatsCard({ title, value, change, changeType = 'neutral', icon, 
   const changeColorClass = {
     positive: 'text-green-600',
     negative: 'text-red-600',
-    neutral: 'text-neutral-gray'
+    neutral: 'text-gray-600'
   }[changeType];
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-neutral-gray truncate">{title}</p>
+          <p className="text-sm font-semibold text-neutral-dark truncate">{title}</p>
           <p className="text-xl sm:text-2xl font-bold text-neutral-dark mt-1">{value}</p>
           {change && (
             <p className={`text-xs sm:text-sm mt-1 ${changeColorClass}`}>
@@ -33,7 +33,7 @@ export function StatsCard({ title, value, change, changeType = 'neutral', icon, 
             </p>
           )}
           {description && (
-            <p className="text-xs text-neutral-gray mt-2 truncate">{description}</p>
+            <p className="text-xs text-gray-600 mt-2 truncate">{description}</p>
           )}
         </div>
         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-primary-orange to-primary-blue rounded-lg flex items-center justify-center flex-shrink-0 ml-4">
@@ -57,7 +57,7 @@ export function PageHeader({ title, description, action }: PageHeaderProps) {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-neutral-dark">{title}</h1>
           {description && (
-            <p className="text-neutral-gray mt-1 text-sm sm:text-base">{description}</p>
+            <p className="text-gray-700 mt-1 text-sm sm:text-base">{description}</p>
           )}
         </div>
         {action && (
@@ -80,14 +80,14 @@ export function Card({ title, description, children, className = '', actions }: 
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
       {(title || description || actions) && (
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
           <div className="flex items-center justify-between">
             <div>
               {title && (
                 <h3 className="text-lg font-semibold text-neutral-dark">{title}</h3>
               )}
               {description && (
-                <p className="text-sm text-neutral-gray mt-1">{description}</p>
+                <p className="text-sm text-gray-700 mt-1">{description}</p>
               )}
             </div>
             {actions && (
@@ -145,7 +145,7 @@ export function Input({
         placeholder={placeholder}
         disabled={disabled}
         required={required}
-        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-orange focus:border-transparent transition-colors ${
+        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-orange focus:border-transparent transition-colors placeholder-gray-400 text-neutral-dark bg-white ${
           error 
             ? 'border-red-300 bg-red-50' 
             : 'border-gray-300 bg-white hover:border-gray-400'
@@ -155,7 +155,7 @@ export function Input({
         <p className="text-sm text-red-600 mt-1">{error}</p>
       )}
       {help && !error && (
-        <p className="text-sm text-neutral-gray mt-1">{help}</p>
+        <p className="text-sm text-gray-600 mt-1">{help}</p>
       )}
     </div>
   );
@@ -201,7 +201,7 @@ export function Textarea({
         placeholder={placeholder}
         disabled={disabled}
         required={required}
-        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-orange focus:border-transparent transition-colors resize-vertical ${
+        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-orange focus:border-transparent transition-colors resize-vertical placeholder-gray-400 text-neutral-dark bg-white ${
           error 
             ? 'border-red-300 bg-red-50' 
             : 'border-gray-300 bg-white hover:border-gray-400'
@@ -211,7 +211,7 @@ export function Textarea({
         <p className="text-sm text-red-600 mt-1">{error}</p>
       )}
       {help && !error && (
-        <p className="text-sm text-neutral-gray mt-1">{help}</p>
+        <p className="text-sm text-gray-600 mt-1">{help}</p>
       )}
     </div>
   );
@@ -259,9 +259,9 @@ export function Button({
   
   const variantClasses = {
     primary: 'bg-primary-orange text-white hover:bg-primary-orange/90 focus:ring-primary-orange',
-    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500',
+    secondary: 'bg-gray-100 text-neutral-dark border border-gray-300 hover:bg-gray-200 focus:ring-gray-500',
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-    ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 focus:ring-gray-500'
+    ghost: 'bg-transparent text-neutral-dark hover:bg-gray-100 focus:ring-gray-500 border border-gray-300'
   };
 
   const sizeClasses = {
@@ -323,7 +323,7 @@ export function Select({
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
         required={required}
-        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-orange focus:border-transparent transition-colors ${
+        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-orange focus:border-transparent transition-colors placeholder-gray-400 text-neutral-dark bg-white ${
           error 
             ? 'border-red-300 bg-red-50' 
             : 'border-gray-300 bg-white hover:border-gray-400'
@@ -331,7 +331,7 @@ export function Select({
       >
         {placeholder && <option value="">{placeholder}</option>}
         {options.map((option) => (
-          <option key={option.value} value={option.value} disabled={option.disabled}>
+          <option key={option.value} value={option.value} disabled={option.disabled} className="text-neutral-dark bg-white">
             {option.label}
           </option>
         ))}
@@ -340,7 +340,7 @@ export function Select({
         <p className="text-sm text-red-600 mt-1">{error}</p>
       )}
       {help && !error && (
-        <p className="text-sm text-neutral-gray mt-1">{help}</p>
+        <p className="text-sm text-gray-600 mt-1">{help}</p>
       )}
     </div>
   );
