@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { DatabaseService } from '@/lib/database';
+import { DatabaseService, prisma } from '@/lib/database';
 import '@/lib/bootstrap'; // side-effect: initialize monitoring early
 import { jsonError, jsonSuccess, withRoute } from '@/lib/api';
 import { logger } from '@/lib/logger';
@@ -27,6 +27,31 @@ export async function POST(request: NextRequest) {
     } catch (e: any) {
       captureError(e, { reqId, stage: 'authenticateUser' });
       throw e;
+    }
+    if (!authResult.success) {
+      // Opportunistic admin auto-provision if first login after deployment
+      const defaultAdminEmail = process.env.ADMIN_EMAIL || 'admin@yukiyaki.id';
+      if (authResult.reason === 'NOT_FOUND' && body.email === defaultAdminEmail) {
+        logger.warn('auth.login:admin_missing_attempt_provision', { reqId, email: body.email });
+        try {
+          const password = body.password;
+          // Basic safeguard: only create if no ANY admin exists
+          const existingAdmin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+          if (!existingAdmin) {
+            await DatabaseService.createUser({
+              email: defaultAdminEmail,
+              password,
+              role: 'ADMIN',
+              preferences: { theme: 'light', language: 'id', notifications: true },
+            });
+            logger.info('auth.login:admin_auto_created', { reqId, email: defaultAdminEmail });
+            // Re-run authentication
+            authResult = await DatabaseService.authenticateUserDetailed(body.email, body.password);
+          }
+        } catch (e: any) {
+          captureError(e, { reqId, stage: 'admin_auto_provision' });
+        }
+      }
     }
     if (!authResult.success) {
       Metrics.authLogin(401);

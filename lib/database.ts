@@ -42,6 +42,7 @@ export class DatabaseService {
         passwordHash,
         role: data.role || 'USER',
         preferences: data.preferences || {},
+        isActive: true,
       },
     });
   }
